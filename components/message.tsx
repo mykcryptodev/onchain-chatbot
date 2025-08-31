@@ -292,6 +292,104 @@ const PurePreviewMessage = ({
                   </Tool>
                 );
               }
+
+              // Handle thirdweb AI tool calls using string matching for now
+              // This is a temporary solution until we can properly integrate the types
+              if (
+                typeof type === 'string' &&
+                type.includes('tool-sign_transaction')
+              ) {
+                return (
+                  <Tool key={`${message.id}-${index}`} defaultOpen={true}>
+                    <ToolHeader
+                      type="tool-sign_transaction"
+                      state="output-available"
+                    />
+                    <ToolContent>
+                      <ToolOutput
+                        output={
+                          <div className="space-y-2">
+                            <p>
+                              Thirdweb AI transaction tool detected. This
+                              feature is being integrated.
+                            </p>
+                            <div className="p-3 bg-muted rounded-lg">
+                              <p>
+                                Transaction tools will be available once the
+                                integration is complete.
+                              </p>
+                            </div>
+                          </div>
+                        }
+                        errorText={undefined}
+                      />
+                    </ToolContent>
+                  </Tool>
+                );
+              }
+
+              if (typeof type === 'string' && type.includes('tool-sign_swap')) {
+                return (
+                  <Tool key={`${message.id}-${index}`} defaultOpen={true}>
+                    <ToolHeader
+                      type="tool-sign_swap"
+                      state="output-available"
+                    />
+                    <ToolContent>
+                      <ToolOutput
+                        output={
+                          <div className="space-y-2">
+                            <p>
+                              Thirdweb AI swap tool detected. This feature is
+                              being integrated.
+                            </p>
+                            <div className="p-3 bg-muted rounded-lg">
+                              <p>
+                                Swap tools will be available once the
+                                integration is complete.
+                              </p>
+                            </div>
+                          </div>
+                        }
+                        errorText={undefined}
+                      />
+                    </ToolContent>
+                  </Tool>
+                );
+              }
+
+              if (
+                typeof type === 'string' &&
+                type.includes('tool-monitor_transaction')
+              ) {
+                return (
+                  <Tool key={`${message.id}-${index}`} defaultOpen={true}>
+                    <ToolHeader
+                      type="tool-monitor_transaction"
+                      state="output-available"
+                    />
+                    <ToolContent>
+                      <ToolOutput
+                        output={
+                          <div className="space-y-2">
+                            <p>
+                              Thirdweb AI transaction monitoring detected. This
+                              feature is being integrated.
+                            </p>
+                            <div className="p-3 bg-muted rounded-lg">
+                              <p>
+                                Transaction monitoring will be available once
+                                the integration is complete.
+                              </p>
+                            </div>
+                          </div>
+                        }
+                        errorText={undefined}
+                      />
+                    </ToolContent>
+                  </Tool>
+                );
+              }
             })}
 
             {!isReadonly && (

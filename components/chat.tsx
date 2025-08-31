@@ -2,6 +2,7 @@
 
 import { DefaultChatTransport } from 'ai';
 import { useChat } from '@ai-sdk/react';
+import type { ThirdwebAiMessage } from '@thirdweb-dev/ai-sdk-provider';
 import { useEffect, useState } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import { ChatHeader } from '@/components/chat-header';

@@ -17,4 +17,10 @@ export const chatModels: Array<ChatModel> = [
     name: 'Reasoning model',
     description: 'Uses advanced reasoning',
   },
+  {
+    id: 'thirdweb-ai',
+    name: 'Thirdweb AI',
+    description:
+      'AI assistant for blockchain interactions, swaps, and transactions',
+  },
 ];

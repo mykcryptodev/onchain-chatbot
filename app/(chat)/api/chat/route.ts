@@ -24,7 +24,7 @@ import { updateDocument } from '@/lib/ai/tools/update-document';
 import { requestSuggestions } from '@/lib/ai/tools/request-suggestions';
 import { getWeather } from '@/lib/ai/tools/get-weather';
 import { isProductionEnvironment } from '@/lib/constants';
-import { myProvider } from '@/lib/ai/providers';
+import { myProvider, thirdwebAI } from '@/lib/ai/providers';
 import { entitlementsByUserType } from '@/lib/ai/entitlements';
 import { postRequestBodySchema, type PostRequestBody } from './schema';
 import { geolocation } from '@vercel/functions';
@@ -151,43 +151,74 @@ export async function POST(request: Request) {
 
     const stream = createUIMessageStream({
       execute: ({ writer: dataStream }) => {
-        const result = streamText({
-          model: myProvider.languageModel(selectedChatModel),
-          system: systemPrompt({ selectedChatModel, requestHints }),
-          messages: convertToModelMessages(uiMessages),
-          stopWhen: stepCountIs(5),
-          experimental_activeTools:
-            selectedChatModel === 'chat-model-reasoning'
-              ? []
-              : [
-                  'getWeather',
-                  'createDocument',
-                  'updateDocument',
-                  'requestSuggestions',
-                ],
-          experimental_transform: smoothStream({ chunking: 'word' }),
-          tools: {
-            getWeather,
-            createDocument: createDocument({ session, dataStream }),
-            updateDocument: updateDocument({ session, dataStream }),
-            requestSuggestions: requestSuggestions({
-              session,
-              dataStream,
+        // Use thirdweb AI for blockchain interactions
+        if (selectedChatModel === 'thirdweb-ai') {
+          const result = streamText({
+            model: thirdwebAI.chat({
+              context: {
+                chain_ids: [1, 8453, 137], // Ethereum, Base, Polygon
+                // from: omitted - will be provided by user when needed
+                auto_execute_transactions: false, // Let user confirm transactions
+              },
             }),
-          },
-          experimental_telemetry: {
-            isEnabled: isProductionEnvironment,
-            functionId: 'stream-text',
-          },
-        });
+            system: systemPrompt({ selectedChatModel, requestHints }),
+            messages: convertToModelMessages(uiMessages),
+            stopWhen: stepCountIs(5),
+            tools: thirdwebAI.tools(), // Use thirdweb's built-in tools
+            experimental_transform: smoothStream({ chunking: 'word' }),
+            experimental_telemetry: {
+              isEnabled: isProductionEnvironment,
+              functionId: 'stream-text-thirdweb',
+            },
+          });
 
-        result.consumeStream();
+          result.consumeStream();
 
-        dataStream.merge(
-          result.toUIMessageStream({
-            sendReasoning: true,
-          }),
-        );
+          dataStream.merge(
+            result.toUIMessageStream({
+              sendReasoning: true,
+            }),
+          );
+        } else {
+          // Use existing models for non-thirdweb interactions
+          const result = streamText({
+            model: myProvider.languageModel(selectedChatModel),
+            system: systemPrompt({ selectedChatModel, requestHints }),
+            messages: convertToModelMessages(uiMessages),
+            stopWhen: stepCountIs(5),
+            experimental_activeTools:
+              selectedChatModel === 'chat-model-reasoning'
+                ? []
+                : [
+                    'getWeather',
+                    'createDocument',
+                    'updateDocument',
+                    'requestSuggestions',
+                  ],
+            experimental_transform: smoothStream({ chunking: 'word' }),
+            tools: {
+              getWeather,
+              createDocument: createDocument({ session, dataStream }),
+              updateDocument: updateDocument({ session, dataStream }),
+              requestSuggestions: requestSuggestions({
+                session,
+                dataStream,
+              }),
+            },
+            experimental_telemetry: {
+              isEnabled: isProductionEnvironment,
+              functionId: 'stream-text',
+            },
+          });
+
+          result.consumeStream();
+
+          dataStream.merge(
+            result.toUIMessageStream({
+              sendReasoning: true,
+            }),
+          );
+        }
       },
       generateId: generateUUID,
       onFinish: async ({ messages }) => {
