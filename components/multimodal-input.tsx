@@ -282,7 +282,7 @@ function PureMultimodalInput({
         {(attachments.length > 0 || uploadQueue.length > 0) && (
           <div
             data-testid="attachments-preview"
-            className="flex overflow-x-scroll flex-row gap-2 items-end px-3 py-2"
+            className="flex overflow-x-auto flex-row gap-2 items-end px-3 py-2 max-w-full"
           >
             {attachments.map((attachment) => (
               <PreviewAttachment

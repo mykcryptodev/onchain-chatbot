@@ -8,7 +8,11 @@ import { motion } from 'framer-motion';
 import { useMessages } from '@/hooks/use-messages';
 import type { ChatMessage } from '@/lib/types';
 import { useDataStream } from './data-stream-provider';
-import { Conversation, ConversationContent, ConversationScrollButton } from './elements/conversation';
+import {
+  Conversation,
+  ConversationContent,
+  ConversationScrollButton,
+} from './elements/conversation';
 
 interface MessagesProps {
   chatId: string;
@@ -44,7 +48,10 @@ function PureMessages({
   useDataStream();
 
   return (
-    <div ref={messagesContainerRef} className="flex-1 overflow-y-auto">
+    <div
+      ref={messagesContainerRef}
+      className="flex-1 overflow-y-auto overflow-x-hidden"
+    >
       <Conversation className="flex flex-col min-w-0 gap-6 pt-4 pb-32">
         <ConversationContent className="flex flex-col gap-6">
           {messages.length === 0 && <Greeting />}
@@ -54,7 +61,9 @@ function PureMessages({
               key={message.id}
               chatId={chatId}
               message={message}
-              isLoading={status === 'streaming' && messages.length - 1 === index}
+              isLoading={
+                status === 'streaming' && messages.length - 1 === index
+              }
               vote={
                 votes
                   ? votes.find((vote) => vote.messageId === message.id)
@@ -71,7 +80,9 @@ function PureMessages({
 
           {status === 'submitted' &&
             messages.length > 0 &&
-            messages[messages.length - 1].role === 'user' && <ThinkingMessage />}
+            messages[messages.length - 1].role === 'user' && (
+              <ThinkingMessage />
+            )}
 
           <motion.div
             ref={messagesEndRef}

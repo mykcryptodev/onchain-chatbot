@@ -102,6 +102,28 @@
     body {
         @apply bg-background text-foreground;
     }
+
+    /* Prevent horizontal overflow on mobile */
+    html, body {
+        overflow-x: hidden;
+        max-width: 100vw;
+    }
+
+    /* Ensure proper word wrapping in code blocks and pre elements */
+    pre, code {
+        word-wrap: break-word;
+        word-break: break-all;
+        white-space: pre-wrap;
+        overflow-wrap: break-word;
+        max-width: 100%;
+    }
+
+    /* Ensure all containers respect viewport width on mobile */
+    @media (max-width: 640px) {
+        .max-w-3xl {
+            max-width: 100% !important;
+        }
+    }
 }
 
 .skeleton {

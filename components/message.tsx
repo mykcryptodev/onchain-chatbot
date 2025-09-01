@@ -65,7 +65,7 @@ const PurePreviewMessage = ({
     <AnimatePresence>
       <motion.div
         data-testid={`message-${message.role}`}
-        className="px-4 mx-auto w-full max-w-3xl group/message"
+        className="px-2 sm:px-4 mx-auto w-full max-w-full sm:max-w-3xl group/message"
         initial={{ y: 5, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         data-role={message.role}
@@ -88,7 +88,7 @@ const PurePreviewMessage = ({
           )}
 
           <div
-            className={cn('flex flex-col gap-4 w-full', {
+            className={cn('flex flex-col gap-4 w-full min-w-0', {
               'min-h-96': message.role === 'assistant' && requiresScrollPadding,
             })}
           >
@@ -416,7 +416,7 @@ const PurePreviewMessage = ({
                                 ) : (
                                   <div className="space-y-2">
                                     <p>Transaction data:</p>
-                                    <pre className="text-xs bg-muted p-3 rounded-lg overflow-auto">
+                                    <pre className="text-xs bg-muted p-3 rounded-lg overflow-auto max-w-full">
                                       {JSON.stringify(part.result, null, 2)}
                                     </pre>
                                   </div>
@@ -520,7 +520,7 @@ const PurePreviewMessage = ({
                                     <div className="space-y-2">
                                       <p>Processing transaction data...</p>
                                       <div className="p-3 bg-muted rounded-lg">
-                                        <pre className="text-xs text-muted-foreground overflow-x-auto">
+                                        <pre className="text-xs text-muted-foreground overflow-x-auto max-w-full">
                                           {JSON.stringify(part.output, null, 2)}
                                         </pre>
                                       </div>
@@ -638,7 +638,7 @@ export const ThinkingMessage = () => {
   return (
     <motion.div
       data-testid="message-assistant-loading"
-      className="px-4 mx-auto w-full max-w-3xl group/message min-h-96"
+      className="px-2 sm:px-4 mx-auto w-full max-w-full sm:max-w-3xl group/message min-h-96"
       initial={{ y: 5, opacity: 0 }}
       animate={{ y: 0, opacity: 1, transition: { delay: 1 } }}
       data-role={role}
