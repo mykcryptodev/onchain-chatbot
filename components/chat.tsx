@@ -91,13 +91,10 @@ export function Chat({
       );
       setDataStream((ds) => (ds ? [...ds, dataPart] : []));
 
-      // Trigger haptic feedback on every text chunk from the bot
-      if (dataPart.type === 'data-textDelta' && 'textDelta' in dataPart) {
-        setMessageChunkCount((prev) => prev + 1);
-        // Trigger light haptic for each text chunk
-        console.debug('Bot text chunk received, triggering light haptic');
-        triggerHaptic('light');
-      }
+      // Trigger haptic feedback on every data chunk - simplified approach
+      console.debug('Triggering haptic for data chunk, type:', dataPart.type);
+      setMessageChunkCount((prev) => prev + 1);
+      triggerHaptic('light');
     },
     onFinish: () => {
       mutate(unstable_serialize(getChatHistoryPaginationKey));
