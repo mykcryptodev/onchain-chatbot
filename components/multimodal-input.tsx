@@ -431,7 +431,6 @@ const StopButton = memo(PureStopButton);
 function PureSignInButton() {
   return (
     <SharedConnectButton
-      className="h-8"
       connectButtonProps={{
         label: 'Sign in to chat',
         style: {

@@ -18,15 +18,12 @@ interface SharedConnectButtonProps {
     label?: string;
     style?: React.CSSProperties;
   };
-  /** Additional CSS classes to apply to the wrapper */
-  className?: string;
   /** Whether to wait for theme to be mounted before rendering */
   waitForMount?: boolean;
 }
 
 export function SharedConnectButton({
   connectButtonProps,
-  className,
   waitForMount = false,
 }: SharedConnectButtonProps) {
   const { resolvedTheme } = useTheme();
@@ -50,37 +47,35 @@ export function SharedConnectButton({
       : 'dark';
 
   return (
-    <div className={className}>
-      <ConnectButton
-        client={client}
-        theme={theme}
-        connectButton={connectButtonProps}
-        auth={{
-          isLoggedIn: async (address) => {
-            try {
-              const result = await isLoggedIn(address);
-              return Boolean(result);
-            } catch (error) {
-              console.error('Error in ConnectButton isLoggedIn:', error);
-              return false;
-            }
-          },
-          doLogin: async (params) => {
-            await loginWithEthereum(params);
+    <ConnectButton
+      client={client}
+      theme={theme}
+      connectButton={connectButtonProps}
+      auth={{
+        isLoggedIn: async (address) => {
+          try {
+            const result = await isLoggedIn(address);
+            return Boolean(result);
+          } catch (error) {
+            console.error('Error in ConnectButton isLoggedIn:', error);
+            return false;
+          }
+        },
+        doLogin: async (params) => {
+          await loginWithEthereum(params);
 
-            // Give NextAuth a moment to set the session cookie
-            await new Promise((resolve) => setTimeout(resolve, 100));
+          // Give NextAuth a moment to set the session cookie
+          await new Promise((resolve) => setTimeout(resolve, 100));
 
-            // Force session update after login
-            await updateSession();
-            router.refresh();
-          },
-          getLoginPayload: async ({ address }) => generatePayload({ address }),
-          doLogout: async () => {
-            await signOut({ redirectTo: '/' });
-          },
-        }}
-      />
-    </div>
+          // Force session update after login
+          await updateSession();
+          router.refresh();
+        },
+        getLoginPayload: async ({ address }) => generatePayload({ address }),
+        doLogout: async () => {
+          await signOut({ redirectTo: '/' });
+        },
+      }}
+    />
   );
 }

@@ -34,7 +34,14 @@ export function SidebarUserNav() {
           </div>
 
           {/* Connect Button */}
-          <SharedConnectButton waitForMount={true} />
+          <SharedConnectButton
+            connectButtonProps={{
+              style: {
+                width: '100%',
+              },
+            }}
+            waitForMount={true}
+          />
         </div>
       </SidebarMenuItem>
     </SidebarMenu>

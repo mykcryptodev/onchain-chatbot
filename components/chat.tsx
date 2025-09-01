@@ -51,14 +51,7 @@ export function Chat({
   const { triggerHaptic } = useFarcaster();
 
   const [input, setInput] = useState<string>('');
-  const [hasTriggeredResponseHaptic, setHasTriggeredResponseHaptic] =
-    useState<boolean>(false);
-
-  // Test function to manually trigger haptics
-  const testHaptic = () => {
-    console.debug('Manual haptic test triggered from chat');
-    triggerHaptic('medium');
-  };
+  const [messageChunkCount, setMessageChunkCount] = useState<number>(0);
 
   const {
     messages,
@@ -93,34 +86,33 @@ export function Chat({
       console.debug(
         'onData called with:',
         dataPart,
-        'hasTriggeredResponseHaptic:',
-        hasTriggeredResponseHaptic,
+        'messageChunkCount:',
+        messageChunkCount,
       );
       setDataStream((ds) => (ds ? [...ds, dataPart] : []));
 
-      // Trigger haptic feedback when AI starts responding (only once per response)
-      // We trigger on the first data chunk regardless of status since onData means streaming has started
-      if (!hasTriggeredResponseHaptic) {
-        console.debug('Bot started responding, triggering haptic feedback');
-        console.debug('triggerHaptic function:', triggerHaptic);
-        triggerHaptic();
-        setHasTriggeredResponseHaptic(true);
-        console.debug('Haptic triggered, flag set to true');
-      } else {
-        console.debug('Haptic already triggered for this response');
+      // Trigger haptic feedback on every text chunk from the bot
+      if (dataPart.type === 'data-textDelta' && 'textDelta' in dataPart) {
+        setMessageChunkCount((prev) => prev + 1);
+        // Trigger light haptic for each text chunk
+        console.debug('Bot text chunk received, triggering light haptic');
+        triggerHaptic('light');
       }
     },
     onFinish: () => {
       mutate(unstable_serialize(getChatHistoryPaginationKey));
-      // Reset the haptic trigger flag when the response finishes
-      setHasTriggeredResponseHaptic(false);
+      // Trigger strong haptic when bot response is complete
+      console.debug('Bot response finished, triggering heavy haptic');
+      triggerHaptic('heavy');
+      // Reset the chunk counter for the next response
+      setMessageChunkCount(0);
     },
     onError: (error) => {
       if (error instanceof ChatSDKError) {
         toast.error(error.message);
       }
-      // Reset the haptic trigger flag when there's an error
-      setHasTriggeredResponseHaptic(false);
+      // Reset the chunk counter when there's an error
+      setMessageChunkCount(0);
     },
   });
 
@@ -155,19 +147,13 @@ export function Chat({
     selectedChainsRef.current = selectedChains;
   }, [selectedChains]);
 
-  // Reset haptic flag when status changes to submitted (new message sent)
+  // Reset chunk counter when new message is submitted
   useEffect(() => {
     console.debug('Chat status changed:', status);
     if (status === 'submitted') {
-      setHasTriggeredResponseHaptic(false);
+      setMessageChunkCount(0);
     }
-    // Try triggering haptic when status changes to streaming
-    if (status === 'streaming' && !hasTriggeredResponseHaptic) {
-      console.debug('Status changed to streaming, triggering haptic feedback');
-      triggerHaptic();
-      setHasTriggeredResponseHaptic(true);
-    }
-  }, [status, hasTriggeredResponseHaptic, triggerHaptic]);
+  }, [status]);
 
   const isArtifactVisible = useArtifactSelector((state) => state.isVisible);
 
@@ -201,15 +187,6 @@ export function Chat({
         />
 
         <div className="sticky bottom-0 flex gap-2 px-4 pb-4 mx-auto w-full max-w-full bg-background md:pb-6 md:max-w-3xl z-[1] border-t-0">
-          {/* Temporary test button for haptics - remove after debugging */}
-          <button
-            type="button"
-            onClick={testHaptic}
-            className="px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600"
-            style={{ fontSize: '10px', minWidth: 'auto' }}
-          >
-            Test Haptic
-          </button>
           {!isReadonly && (
             <MultimodalInput
               chatId={id}
