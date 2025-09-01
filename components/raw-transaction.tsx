@@ -25,6 +25,9 @@ import { defineChain } from 'thirdweb/chains';
 import { approve, allowance, decimals } from 'thirdweb/extensions/erc20';
 import { AlertTriangle, CheckCircle, ExternalLink } from 'lucide-react';
 import { getBlockExplorerUrl, getChainName } from '@/lib/utils';
+import { ContractAddressDisplay } from '@/components/contract-address-display';
+import { shortenAddress } from 'thirdweb/utils';
+import { TokenProvider, TokenSymbol } from 'thirdweb/react';
 
 interface RawTransactionProps {
   transactionData: {
@@ -204,22 +207,6 @@ export function RawTransaction({ transactionData }: RawTransactionProps) {
     });
   };
 
-  const getTokenSymbol = (address: string) => {
-    const tokenMap: Record<string, string> = {
-      // Native tokens
-      '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE': 'ETH',
-      '0x0000000000000000000000000000000000000000': 'ETH',
-
-      // Common tokens (can be expanded as needed)
-      '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913': 'USDC', // Base USDC
-      '0xA0b86a33E6441b8F4d6f34E4b6c84b8a2F2e0C2b': 'USDC', // Ethereum USDC
-      '0xdAC17F958D2ee523a2206206994597C13D831ec7': 'USDT', // Ethereum USDT
-      '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174': 'USDC', // Polygon USDC
-      '0xc2132D05D31c914a87C6611C10748AEb04B58e8F': 'USDT', // Polygon USDT
-    };
-    return tokenMap[address] || `${address.slice(0, 6)}...`;
-  };
-
   if (isCompleted && transactionResult) {
     return (
       <Card className="w-full max-w-md">
@@ -291,9 +278,15 @@ export function RawTransaction({ transactionData }: RawTransactionProps) {
                 <div className="text-right">
                   <p className="text-sm font-medium">
                     {formatAmount(transactionData.intent.amount, true)}{' '}
-                    {getTokenSymbol(
-                      transactionData.intent.origin_token_address,
-                    )}
+                    <TokenProvider
+                      address={transactionData.intent.origin_token_address}
+                      chain={defineChain(
+                        transactionData.intent.origin_chain_id,
+                      )}
+                      client={client}
+                    >
+                      <TokenSymbol />
+                    </TokenProvider>
                   </p>
                   <Badge variant="secondary" className="text-xs">
                     {getChainName(transactionData.intent.origin_chain_id)}
@@ -309,9 +302,15 @@ export function RawTransaction({ transactionData }: RawTransactionProps) {
                 <span className="text-sm">To:</span>
                 <div className="text-right">
                   <p className="text-sm font-medium">
-                    {getTokenSymbol(
-                      transactionData.intent.destination_token_address,
-                    )}
+                    <TokenProvider
+                      address={transactionData.intent.destination_token_address}
+                      chain={defineChain(
+                        transactionData.intent.destination_chain_id,
+                      )}
+                      client={client}
+                    >
+                      <TokenSymbol />
+                    </TokenProvider>
                   </p>
                   <Badge variant="secondary" className="text-xs">
                     {getChainName(transactionData.intent.destination_chain_id)}
@@ -328,10 +327,10 @@ export function RawTransaction({ transactionData }: RawTransactionProps) {
           <div className="p-3 bg-muted rounded-lg space-y-1">
             <div className="flex justify-between">
               <span className="text-xs text-muted-foreground">Contract:</span>
-              <span className="text-xs font-mono">
-                {transactionData.transaction.to.slice(0, 6)}...
-                {transactionData.transaction.to.slice(-4)}
-              </span>
+              <ContractAddressDisplay
+                address={transactionData.transaction.to}
+                className="text-right"
+              />
             </div>
             <div className="flex justify-between">
               <span className="text-xs text-muted-foreground">Function:</span>
@@ -368,11 +367,24 @@ export function RawTransaction({ transactionData }: RawTransactionProps) {
                     <AlertTitle>Approval Required</AlertTitle>
                     <AlertDescription>
                       You need to approve{' '}
-                      {transactionData.intent &&
-                        getTokenSymbol(
-                          transactionData.intent.origin_token_address,
-                        )}{' '}
-                      spending before the swap can execute.
+                      {transactionData.intent && (
+                        <TokenProvider
+                          address={transactionData.intent.origin_token_address}
+                          chain={defineChain(
+                            transactionData.intent.origin_chain_id,
+                          )}
+                          client={client}
+                        >
+                          <TokenSymbol />
+                        </TokenProvider>
+                      )}{' '}
+                      spending to{' '}
+                      <ContractAddressDisplay
+                        address={transactionData.transaction.to}
+                        showFullAddress={false}
+                        className="inline-flex items-center gap-1"
+                      />{' '}
+                      before the swap can execute.
                     </AlertDescription>
                   </div>
                 </Alert>
@@ -394,10 +406,17 @@ export function RawTransaction({ transactionData }: RawTransactionProps) {
                   className="w-full"
                 >
                   Approve{' '}
-                  {transactionData.intent &&
-                    getTokenSymbol(
-                      transactionData.intent.origin_token_address,
-                    )}{' '}
+                  {transactionData.intent && (
+                    <TokenProvider
+                      address={transactionData.intent.origin_token_address}
+                      chain={defineChain(
+                        transactionData.intent.origin_chain_id,
+                      )}
+                      client={client}
+                    >
+                      <TokenSymbol />
+                    </TokenProvider>
+                  )}{' '}
                   Spending
                 </TransactionButton>
               </div>
@@ -465,7 +484,7 @@ export function RawTransaction({ transactionData }: RawTransactionProps) {
             <AlertTitle>Important</AlertTitle>
             <AlertDescription>
               {activeAccount
-                ? `This will execute a smart contract transaction using your connected wallet (${activeAccount.address?.slice(0, 6)}...${activeAccount.address?.slice(-4)}). Make sure you have sufficient balance and gas fees on ${getChainName(transactionData.transaction.chain_id)}.`
+                ? `This will execute a smart contract transaction using your connected wallet (${activeAccount.address ? shortenAddress(activeAccount.address, 4) : ''}). Make sure you have sufficient balance and gas fees on ${getChainName(transactionData.transaction.chain_id)}.`
                 : `This will execute a smart contract transaction using your authenticated wallet. Make sure you have sufficient balance and gas fees on ${getChainName(transactionData.transaction.chain_id)}.`}
             </AlertDescription>
           </div>

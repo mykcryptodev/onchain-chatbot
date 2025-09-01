@@ -44,6 +44,17 @@ The integration allows users to:
 - Ensures wallet address is available throughout the application
 - Proper null/undefined handling for TypeScript compatibility
 
+### 6. Zapper API Integration
+- **`lib/zapper-api.ts`**: Utility functions for resolving contract addresses to human-readable names
+- **`components/contract-address-display.tsx`**: React component that displays contract addresses with resolved names
+- **`app/(chat)/api/address-info/route.ts`**: API endpoint for fetching address information
+- **Enhanced transaction display**: Shows human-readable names for contract addresses in transaction signatures
+
+### 7. Enhanced Token Display
+- **Dynamic Token Symbols**: Uses Thirdweb's built-in `TokenProvider` and `TokenSymbol` components
+- **Universal Support**: Works with any ERC-20 token and native tokens automatically
+- **Optimized Performance**: Leverages Thirdweb's caching and optimization strategies
+
 ## Environment Variables Required
 
 ```bash
@@ -54,6 +65,9 @@ NEXT_PUBLIC_THIRDWEB_CLIENT_ID=your_thirdweb_client_id_here
 # Domain configuration for SIWE
 NEXT_PUBLIC_DOMAIN=localhost:3000
 NEXT_PUBLIC_ORIGIN=http://localhost:3000
+
+# Zapper API for contract address resolution
+ZAPPER_API_KEY=your_zapper_api_key_here
 ```
 
 ## How It Works
