@@ -10,6 +10,21 @@ import type { DBMessage, Document } from '@/lib/db/schema';
 import { ChatSDKError, type ErrorCode } from './errors';
 import type { ChatMessage, ChatTools, CustomUIDataTypes } from './types';
 import { formatISO } from 'date-fns';
+import {
+  ethereum,
+  base,
+  polygon,
+  bsc,
+  avalanche,
+  arbitrum,
+  optimism,
+  celo,
+  gnosis,
+  fantom,
+  zkSync,
+  linea,
+  scroll,
+} from 'thirdweb/chains';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -113,4 +128,64 @@ export function getTextFromMessage(message: ChatMessage): string {
     .filter((part) => part.type === 'text')
     .map((part) => part.text)
     .join('');
+}
+
+/**
+ * Get the block explorer URL for a given chain and transaction hash using thirdweb chains
+ */
+export function getBlockExplorerUrl(chainId: number, txHash: string): string {
+  // Map chain IDs to thirdweb chain objects
+  const chainMap = new Map([
+    [1, ethereum],
+    [8453, base],
+    [137, polygon],
+    [56, bsc],
+    [43114, avalanche],
+    [42161, arbitrum],
+    [10, optimism],
+    [42220, celo],
+    [100, gnosis],
+    [250, fantom],
+    [324, zkSync],
+    [59144, linea],
+    [534352, scroll],
+  ]);
+
+  const chain = chainMap.get(chainId);
+  if (chain?.blockExplorers?.[0]?.url) {
+    return `${chain.blockExplorers[0].url}/tx/${txHash}`;
+  }
+
+  // Fallback to Etherscan for unknown chains
+  return `https://etherscan.io/tx/${txHash}`;
+}
+
+/**
+ * Get the chain name for display purposes using thirdweb chains
+ */
+export function getChainName(chainId: number): string {
+  // Map chain IDs to thirdweb chain objects
+  const chainMap = new Map([
+    [1, ethereum],
+    [8453, base],
+    [137, polygon],
+    [56, bsc],
+    [43114, avalanche],
+    [42161, arbitrum],
+    [10, optimism],
+    [42220, celo],
+    [100, gnosis],
+    [250, fantom],
+    [324, zkSync],
+    [59144, linea],
+    [534352, scroll],
+  ]);
+
+  const chain = chainMap.get(chainId);
+  if (chain?.name) {
+    return chain.name;
+  }
+
+  // Fallback for unknown chains
+  return `Chain ${chainId}`;
 }

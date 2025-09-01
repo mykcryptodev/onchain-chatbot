@@ -23,7 +23,8 @@ import { prepareTransaction, getContract, toTokens } from 'thirdweb';
 import { client } from '@/providers/Thirdweb';
 import { defineChain } from 'thirdweb/chains';
 import { approve, allowance, decimals } from 'thirdweb/extensions/erc20';
-import { AlertTriangle, CheckCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle, ExternalLink } from 'lucide-react';
+import { getBlockExplorerUrl, getChainName } from '@/lib/utils';
 
 interface RawTransactionProps {
   transactionData: {
@@ -174,19 +175,6 @@ export function RawTransaction({ transactionData }: RawTransactionProps) {
     return `${wholePart.toString()}.${trimmedFractional}`;
   };
 
-  const getChainName = (chainId: number) => {
-    const chains: Record<number, string> = {
-      1: 'Ethereum',
-      8453: 'Base',
-      137: 'Polygon',
-      56: 'BSC',
-      43114: 'Avalanche',
-      42161: 'Arbitrum',
-      10: 'Optimism',
-    };
-    return chains[chainId] || `Chain ${chainId}`;
-  };
-
   // Prepare approval transaction
   const prepareApprovalTransaction = () => {
     if (!tokenContract || !transactionData.intent) {
@@ -254,11 +242,24 @@ export function RawTransaction({ transactionData }: RawTransactionProps) {
             </div>
           )}
           {transactionResult.transactionHash && (
-            <div>
+            <div className="space-y-2">
               <p className="text-sm font-medium">Transaction Hash:</p>
               <p className="text-xs text-muted-foreground font-mono break-all">
                 {transactionResult.transactionHash}
               </p>
+              <a
+                href={getBlockExplorerUrl(
+                  transactionData.transaction.chain_id,
+                  transactionResult.transactionHash,
+                )}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 transition-colors"
+              >
+                <ExternalLink className="h-3 w-3" />
+                View on {getChainName(transactionData.transaction.chain_id)}{' '}
+                Explorer
+              </a>
             </div>
           )}
         </CardContent>

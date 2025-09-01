@@ -17,7 +17,8 @@ import {
   authenticateWithThirdweb,
 } from '@/lib/thirdweb-actions';
 import { toast } from 'sonner';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, ExternalLink } from 'lucide-react';
+import { getBlockExplorerUrl, getChainName } from '@/lib/utils';
 
 interface SwapTransactionProps {
   swapData: {
@@ -97,19 +98,6 @@ export function SwapTransaction({ swapData }: SwapTransactionProps) {
     return `${wholePart.toString()}.${trimmedFractional}`;
   };
 
-  const getChainName = (chainId: number) => {
-    const chains: Record<number, string> = {
-      1: 'Ethereum',
-      8453: 'Base',
-      137: 'Polygon',
-      56: 'BSC',
-      43114: 'Avalanche',
-      42161: 'Arbitrum',
-      10: 'Optimism',
-    };
-    return chains[chainId] || `Chain ${chainId}`;
-  };
-
   if (isCompleted && transactionResult) {
     return (
       <Card className="w-full max-w-md">
@@ -132,11 +120,23 @@ export function SwapTransaction({ swapData }: SwapTransactionProps) {
             </div>
           )}
           {transactionResult.transactionHash && (
-            <div>
+            <div className="space-y-2">
               <p className="text-sm font-medium">Transaction Hash:</p>
               <p className="text-xs text-muted-foreground font-mono break-all">
                 {transactionResult.transactionHash}
               </p>
+              <a
+                href={getBlockExplorerUrl(
+                  swapData.tokenIn.chainId,
+                  transactionResult.transactionHash,
+                )}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 transition-colors"
+              >
+                <ExternalLink className="h-3 w-3" />
+                View on {getChainName(swapData.tokenIn.chainId)} Explorer
+              </a>
             </div>
           )}
         </CardContent>
