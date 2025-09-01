@@ -104,19 +104,11 @@ export function FarcasterProvider({ children }: { children: React.ReactNode }) {
   const triggerHaptic = useCallback(
     (type: 'light' | 'medium' | 'heavy' = 'light') => {
       // Use Farcaster SDK haptics with fallback to browser API
-      console.log('🎯 Triggering haptic feedback:', type, {
-        isInFarcaster,
-        hasSDK: !!sdk?.haptics,
-      });
       try {
         if (isInFarcaster && sdk?.haptics) {
           // Use impact feedback for interactions with different intensities
-          console.log('📱 Using Farcaster SDK haptics');
           sdk.haptics.impactOccurred(type).catch(() => {
             // Fallback to browser vibration API if SDK haptics fail
-            console.log(
-              '⚠️ Farcaster haptics failed, falling back to browser vibration',
-            );
             const vibrationPattern =
               type === 'heavy' ? 100 : type === 'medium' ? 75 : 50;
             if (
@@ -129,7 +121,6 @@ export function FarcasterProvider({ children }: { children: React.ReactNode }) {
           });
         } else {
           // Fallback to browser vibration API if not in Farcaster
-          console.log('🌐 Using browser vibration API');
           const vibrationPattern =
             type === 'heavy' ? 100 : type === 'medium' ? 75 : 50;
           if (
@@ -137,10 +128,7 @@ export function FarcasterProvider({ children }: { children: React.ReactNode }) {
             'navigator' in window &&
             'vibrate' in navigator
           ) {
-            console.log('📳 Vibrating with pattern:', vibrationPattern);
             navigator.vibrate(vibrationPattern);
-          } else {
-            console.log('❌ Navigator vibrate not available');
           }
         }
       } catch (error) {

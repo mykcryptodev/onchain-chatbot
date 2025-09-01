@@ -89,7 +89,6 @@ export function Chat({
       // Trigger haptic feedback when AI starts responding (only once per response)
       // We trigger on the first data chunk regardless of status since onData means streaming has started
       if (!hasTriggeredResponseHaptic) {
-        console.log('🤖 AI response started - triggering haptic feedback');
         triggerHaptic();
         setHasTriggeredResponseHaptic(true);
       }

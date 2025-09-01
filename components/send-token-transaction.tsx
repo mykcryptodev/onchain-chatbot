@@ -159,7 +159,7 @@ export function SendTokenTransaction({ sendData }: SendTokenTransactionProps) {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 text-xs sm:text-sm text-blue-600 hover:text-blue-800 transition-colors break-all"
               >
-                <ExternalLink className="size-3 flex-shrink-0" />
+                <ExternalLink className="size-3 shrink-0" />
                 View on {getChainName(sendData.chainId)} Explorer
               </a>
             </div>

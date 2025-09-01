@@ -24,6 +24,37 @@ toast.success = (description: string) =>
 toast.error = (description: string) => toast({ type: 'error', description });
 toast.info = (description: string) => toast({ type: 'info', description });
 
+// Add promise method for loading states
+toast.promise = <T,>(
+  promise: Promise<T>,
+  options: {
+    loading: string;
+    success: string | ((data: T) => string);
+    error: string | ((error: any) => string);
+  },
+) => {
+  // Show loading toast
+  toast.info(options.loading);
+
+  return promise
+    .then((data) => {
+      const successMessage =
+        typeof options.success === 'function'
+          ? options.success(data)
+          : options.success;
+      toast.success(successMessage);
+      return data;
+    })
+    .catch((error) => {
+      const errorMessage =
+        typeof options.error === 'function'
+          ? options.error(error)
+          : options.error;
+      toast.error(errorMessage);
+      throw error;
+    });
+};
+
 function Toast(props: ToastProps) {
   const { id, type, description } = props;
   const { triggerHaptic } = useFarcaster();
@@ -33,15 +64,11 @@ function Toast(props: ToastProps) {
 
   // Trigger haptic feedback when toast appears - different intensity for different types
   useEffect(() => {
-    console.log('🍞 Toast component mounted with type:', type);
     if (type === 'success') {
-      console.log('✅ Triggering medium haptic for success toast');
       triggerHaptic('medium'); // Success gets medium haptic feedback
     } else if (type === 'error') {
-      console.log('❌ Triggering heavy haptic for error toast');
       triggerHaptic('heavy'); // Error gets heavy haptic feedback
     } else if (type === 'info') {
-      console.log('ℹ️ Triggering light haptic for info toast');
       triggerHaptic('light'); // Info gets light haptic feedback
     }
   }, [type, triggerHaptic]);
