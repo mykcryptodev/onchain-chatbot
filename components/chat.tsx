@@ -84,6 +84,7 @@ export function Chat({
     }),
     onData: (dataPart) => {
       // Trigger haptic feedback on every data chunk for continuous feedback
+      // This includes both thinking (reasoning) and response text chunks
       triggerHaptic(); // Use default like sidebar
 
       setDataStream((ds) => (ds ? [...ds, dataPart] : []));
