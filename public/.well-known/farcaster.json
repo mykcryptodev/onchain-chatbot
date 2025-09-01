@@ -1,0 +1,18 @@
+{
+  "accountAssociation": {
+    "header": "eyJmaWQiOjIxNzI0OCwidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweGViYTc4NzE3YjZmMDU5Q0ZFMGI3NUU3NUMyZWQ0QkI3Y0E2NTE1NEYifQ",
+    "payload": "eyJkb21haW4iOiJvbmNoYWluLWNoYXRib3QudmVyY2VsLmFwcCJ9", 
+    "signature": "MHg4MTljNGVmNGVkZjc5ODg5MzI2ZDEzMWNjODlhMTJiZGY1ZjJmZmM0YzM5ZDUwYjVhZTIwYTY1M2E3YzQ2ODYwNWVjY2RhMTY2ZDAzMjNmZDRiODJmZDVlM2QxMTRjMmU4NGQxZWZlYTNmZGQyY2Y5MGJmNGQ4YjUwOTA2MmJjMzFi"
+  },
+  "miniapp": {
+    "version": "1",
+    "name": "Onchain Chatbot",
+    "iconUrl": "https://onchain-chatbot.vercel.app/favicon.ico",
+    "homeUrl": "https://onchain-chatbot.vercel.app/",
+    "imageUrl": "https://onchain-chatbot.vercel.app/opengraph-image.png",
+    "buttonTitle": "🤖 Chat",
+    "splashImageUrl": "https://onchain-chatbot.vercel.app/favicon.ico",
+    "splashBackgroundColor": "#000000",
+    "webhookUrl": "https://onchain-chatbot.vercel.app/api/webhook"
+  }
+}

@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 
 import { auth } from '@/app/(auth)/auth';
 import { Chat } from '@/components/chat';
@@ -7,6 +8,47 @@ import { getChatById, getMessagesByChatId } from '@/lib/db/queries';
 import { DataStreamHandler } from '@/components/data-stream-handler';
 import { DEFAULT_CHAT_MODEL } from '@/lib/ai/models';
 import { convertToUIMessages } from '@/lib/utils';
+
+export async function generateMetadata(props: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const params = await props.params;
+  const { id } = params;
+  const chat = await getChatById({ id });
+
+  if (!chat) {
+    return {
+      title: 'Chat Not Found - Onchain Chatbot',
+      description: 'The requested chat could not be found.',
+    };
+  }
+
+  const chatTitle = chat.title || 'Untitled Chat';
+
+  return {
+    title: `${chatTitle} - Onchain Chatbot`,
+    description: `Continue your conversation: ${chatTitle}. AI assistant for blockchain operations and Web3 interactions.`,
+    openGraph: {
+      title: `${chatTitle} - Onchain Chatbot`,
+      description: `Continue your conversation: ${chatTitle}. AI assistant for blockchain operations and Web3 interactions.`,
+      images: ['/opengraph-image.png'],
+    },
+    other: {
+      'fc:miniapp': JSON.stringify({
+        version: '1',
+        imageUrl: 'https://chat.vercel.ai/opengraph-image.png',
+        button: {
+          title: '💬 Continue Chat',
+          action: {
+            type: 'launch_frame',
+            name: 'Onchain Chatbot',
+            url: `https://chat.vercel.ai/chat/${id}`,
+          },
+        },
+      }),
+    },
+  };
+}
 
 export default async function Page(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
