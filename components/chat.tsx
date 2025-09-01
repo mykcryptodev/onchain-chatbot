@@ -138,12 +138,14 @@ export function Chat({
     selectedChainsRef.current = selectedChains;
   }, [selectedChains]);
 
-  // Reset counter when new message is submitted
+  // Reset counter when new message is submitted and trigger thinking haptic
   useEffect(() => {
     if (status === 'submitted') {
       setMessageChunkCount(0);
+      // Trigger haptic when AI starts thinking
+      triggerHaptic();
     }
-  }, [status]);
+  }, [status, triggerHaptic]);
 
   const isArtifactVisible = useArtifactSelector((state) => state.isVisible);
 
