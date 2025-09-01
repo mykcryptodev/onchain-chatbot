@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState, type ReactNode } from 'react';
 import { toast as sonnerToast } from 'sonner';
 import { CheckCircleFillIcon, WarningIcon } from './icons';
 import { cn } from '@/lib/utils';
+import { useFarcaster } from '@/components/farcaster-provider';
 
 const iconsByType: Record<'success' | 'error', ReactNode> = {
   success: <CheckCircleFillIcon />,
@@ -18,9 +19,19 @@ export function toast(props: Omit<ToastProps, 'id'>) {
 
 function Toast(props: ToastProps) {
   const { id, type, description } = props;
+  const { triggerHaptic } = useFarcaster();
 
   const descriptionRef = useRef<HTMLDivElement>(null);
   const [multiLine, setMultiLine] = useState(false);
+
+  // Trigger haptic feedback when toast appears - different intensity for success vs error
+  useEffect(() => {
+    if (type === 'success') {
+      triggerHaptic('medium'); // Success gets medium haptic feedback
+    } else if (type === 'error') {
+      triggerHaptic('heavy'); // Error gets heavy haptic feedback
+    }
+  }, [type, triggerHaptic]);
 
   useEffect(() => {
     const el = descriptionRef.current;

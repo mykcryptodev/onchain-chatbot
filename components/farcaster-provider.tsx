@@ -19,7 +19,7 @@ import { base } from 'thirdweb/chains';
 import { client } from '@/providers/Thirdweb';
 
 interface FarcasterContextType {
-  triggerHaptic: () => void;
+  triggerHaptic: (type?: 'light' | 'medium' | 'heavy') => void;
   context: any;
   isSDKLoaded: boolean;
   connectWallet: () => Promise<void>;
@@ -101,36 +101,43 @@ export function FarcasterProvider({ children }: { children: React.ReactNode }) {
     }
   }, [isSDKLoaded, connectWallet, activeWallet]);
 
-  const triggerHaptic = useCallback(() => {
-    // Use Farcaster SDK haptics with fallback to browser API
-    try {
-      if (isInFarcaster && sdk?.haptics) {
-        // Use impact feedback for interactions
-        sdk.haptics.impactOccurred('light').catch(() => {
-          // Fallback to browser vibration API if SDK haptics fail
+  const triggerHaptic = useCallback(
+    (type: 'light' | 'medium' | 'heavy' = 'light') => {
+      // Use Farcaster SDK haptics with fallback to browser API
+      try {
+        if (isInFarcaster && sdk?.haptics) {
+          // Use impact feedback for interactions with different intensities
+          sdk.haptics.impactOccurred(type).catch(() => {
+            // Fallback to browser vibration API if SDK haptics fail
+            const vibrationPattern =
+              type === 'heavy' ? 100 : type === 'medium' ? 75 : 50;
+            if (
+              typeof window !== 'undefined' &&
+              'navigator' in window &&
+              'vibrate' in navigator
+            ) {
+              navigator.vibrate(vibrationPattern);
+            }
+          });
+        } else {
+          // Fallback to browser vibration API if not in Farcaster
+          const vibrationPattern =
+            type === 'heavy' ? 100 : type === 'medium' ? 75 : 50;
           if (
             typeof window !== 'undefined' &&
             'navigator' in window &&
             'vibrate' in navigator
           ) {
-            navigator.vibrate(50);
+            navigator.vibrate(vibrationPattern);
           }
-        });
-      } else {
-        // Fallback to browser vibration API if not in Farcaster
-        if (
-          typeof window !== 'undefined' &&
-          'navigator' in window &&
-          'vibrate' in navigator
-        ) {
-          navigator.vibrate(50);
         }
+      } catch (error) {
+        // Silent fallback - haptics are not critical functionality
+        console.debug('Haptic feedback not available:', error);
       }
-    } catch (error) {
-      // Silent fallback - haptics are not critical functionality
-      console.debug('Haptic feedback not available:', error);
-    }
-  }, [isInFarcaster]);
+    },
+    [isInFarcaster],
+  );
 
   return (
     <FarcasterContext.Provider

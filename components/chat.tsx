@@ -87,7 +87,8 @@ export function Chat({
       setDataStream((ds) => (ds ? [...ds, dataPart] : []));
 
       // Trigger haptic feedback when AI starts responding (only once per response)
-      if (!hasTriggeredResponseHaptic && status === 'streaming') {
+      // We trigger on the first data chunk regardless of status since onData means streaming has started
+      if (!hasTriggeredResponseHaptic) {
         triggerHaptic();
         setHasTriggeredResponseHaptic(true);
       }
