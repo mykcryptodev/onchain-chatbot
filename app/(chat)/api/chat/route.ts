@@ -14,6 +14,7 @@ import {
   getChatById,
   getMessageCountByUserId,
   getMessagesByChatId,
+  getUserById,
   saveChat,
   saveMessages,
 } from '@/lib/db/queries';
@@ -150,14 +151,18 @@ export async function POST(request: Request) {
     await createStreamId({ streamId, chatId: id });
 
     const stream = createUIMessageStream({
-      execute: ({ writer: dataStream }) => {
+      execute: async ({ writer: dataStream }) => {
         // Use thirdweb AI for blockchain interactions
         if (selectedChatModel === 'thirdweb-ai') {
+          // Get user's wallet address for thirdweb context
+          const user = await getUserById(session.user.id);
+          const userWalletAddress = user?.walletAddress || undefined;
+
           const result = streamText({
             model: thirdwebAI.chat({
               context: {
                 chain_ids: [1, 8453, 137], // Ethereum, Base, Polygon
-                // from: omitted - will be provided by user when needed
+                from: userWalletAddress, // Use authenticated user's wallet
                 auto_execute_transactions: false, // Let user confirm transactions
               },
             }),
@@ -253,6 +258,16 @@ export async function POST(request: Request) {
     if (error instanceof ChatSDKError) {
       return error.toResponse();
     }
+
+    console.error('Unexpected error in chat route:', error);
+    return Response.json(
+      {
+        code: 'internal_server_error:chat',
+        message: 'Something went wrong. Please try again later.',
+        cause: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 },
+    );
   }
 }
 

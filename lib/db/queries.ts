@@ -63,6 +63,16 @@ export async function createUser(email: string, password: string) {
   }
 }
 
+export async function getUserById(userId: string): Promise<User | null> {
+  try {
+    const result = await db.select().from(user).where(eq(user.id, userId));
+    return result.length > 0 ? result[0] : null;
+  } catch (error) {
+    console.error('Database error in getUserById:', error);
+    throw new ChatSDKError('bad_request:database', 'Failed to get user by id');
+  }
+}
+
 export async function getUserByWallet(
   walletAddress: string,
 ): Promise<Array<User>> {
