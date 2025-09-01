@@ -13,6 +13,7 @@ import {
 } from 'react';
 import { toast } from '@/components/toast';
 import { useLocalStorage, useWindowSize } from 'usehooks-ts';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 import { ArrowUpIcon, PaperclipIcon, StopIcon } from './icons';
 import { PreviewAttachment } from './preview-attachment';
@@ -215,12 +216,18 @@ function PureMultimodalInput({
   );
 
   const { isAtBottom, scrollToBottom } = useScrollToBottom();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (status === 'submitted') {
-      scrollToBottom();
+      // Use a slight delay to allow the message to be rendered first
+      // On mobile, use 'auto' for less aggressive scrolling to keep user message visible
+      // On desktop, use 'smooth' for better UX
+      setTimeout(() => {
+        scrollToBottom(isMobile ? 'auto' : 'smooth');
+      }, 100);
     }
-  }, [status, scrollToBottom]);
+  }, [status, scrollToBottom, isMobile]);
 
   return (
     <div className="flex relative flex-col gap-4 w-full">

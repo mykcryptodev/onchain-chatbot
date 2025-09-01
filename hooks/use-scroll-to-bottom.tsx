@@ -1,11 +1,13 @@
 import useSWR from 'swr';
 import { useRef, useEffect, useCallback } from 'react';
+import { useIsMobile } from './use-mobile';
 
 type ScrollFlag = ScrollBehavior | false;
 
 export function useScrollToBottom() {
   const containerRef = useRef<HTMLDivElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   const { data: isAtBottom = false, mutate: setIsAtBottom } = useSWR(
     'messages:is-at-bottom',
@@ -18,10 +20,14 @@ export function useScrollToBottom() {
 
   useEffect(() => {
     if (scrollBehavior) {
-      endRef.current?.scrollIntoView({ behavior: scrollBehavior });
+      endRef.current?.scrollIntoView({
+        behavior: scrollBehavior,
+        block: isMobile ? 'center' : 'end',
+        inline: 'nearest',
+      });
       setScrollBehavior(false);
     }
-  }, [setScrollBehavior, scrollBehavior]);
+  }, [setScrollBehavior, scrollBehavior, isMobile]);
 
   const scrollToBottom = useCallback(
     (scrollBehavior: ScrollBehavior = 'smooth') => {
