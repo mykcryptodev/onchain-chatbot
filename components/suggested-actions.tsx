@@ -11,12 +11,16 @@ interface SuggestedActionsProps {
   chatId: string;
   sendMessage: UseChatHelpers<ChatMessage>['sendMessage'];
   selectedVisibilityType: VisibilityType;
+  scrollToBottom: (behavior?: ScrollBehavior) => void;
+  isMobile: boolean;
 }
 
 function PureSuggestedActions({
   chatId,
   sendMessage,
   selectedVisibilityType,
+  scrollToBottom,
+  isMobile,
 }: SuggestedActionsProps) {
   const suggestedActions = [
     'Swap 1 USDC to native ETH on Base',
@@ -46,6 +50,14 @@ function PureSuggestedActions({
                 role: 'user',
                 parts: [{ type: 'text', text: suggestion }],
               });
+
+              // Scroll to show the newly posted message
+              // Use a slight delay to allow the message to be rendered first
+              // On mobile, use 'auto' for less aggressive scrolling to keep user message visible
+              // On desktop, use 'smooth' for better UX
+              setTimeout(() => {
+                scrollToBottom(isMobile ? 'auto' : 'smooth');
+              }, 100);
             }}
             className="text-left w-full h-auto whitespace-normal p-3"
           >
@@ -63,6 +75,7 @@ export const SuggestedActions = memo(
     if (prevProps.chatId !== nextProps.chatId) return false;
     if (prevProps.selectedVisibilityType !== nextProps.selectedVisibilityType)
       return false;
+    if (prevProps.isMobile !== nextProps.isMobile) return false;
 
     return true;
   },

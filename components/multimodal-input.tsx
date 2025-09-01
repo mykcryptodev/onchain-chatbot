@@ -263,6 +263,8 @@ function PureMultimodalInput({
             sendMessage={sendMessage}
             chatId={chatId}
             selectedVisibilityType={selectedVisibilityType}
+            scrollToBottom={scrollToBottom}
+            isMobile={isMobile}
           />
         )}
 
