@@ -59,13 +59,27 @@ const PurePreviewMessage = ({
     (part) => part.type === 'file',
   );
 
+  // Check if this message contains tool parts that need full width on mobile
+  const hasToolParts = message.parts.some(
+    (part) =>
+      typeof part.type === 'string' &&
+      (part.type.includes('tool-sign_transaction') ||
+        part.type.includes('tool-sign_swap') ||
+        part.type.includes('tool-monitor_transaction')),
+  );
+
   useDataStream();
 
   return (
     <AnimatePresence>
       <motion.div
         data-testid={`message-${message.role}`}
-        className="px-2 sm:px-4 mx-auto w-full max-w-full sm:max-w-3xl group/message overflow-hidden"
+        className={cn(
+          'mx-auto w-full group/message overflow-hidden',
+          hasToolParts
+            ? 'px-1 sm:px-4 max-w-full'
+            : 'px-2 sm:px-4 max-w-full sm:max-w-3xl',
+        )}
         initial={{ y: 5, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         data-role={message.role}
