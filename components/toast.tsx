@@ -4,7 +4,42 @@ import React, { useEffect, useRef, useState, type ReactNode } from 'react';
 import { toast as sonnerToast } from 'sonner';
 import { CheckCircleFillIcon, WarningIcon } from './icons';
 import { cn } from '@/lib/utils';
-import { useFarcaster } from '@/components/farcaster-provider';
+
+// Helper function to trigger haptic feedback
+// This will work in Farcaster frames and fallback to browser vibration
+function triggerHaptic(type: 'light' | 'medium' | 'heavy' = 'light') {
+  try {
+    // Check if we're in a Farcaster frame
+    if (typeof window !== 'undefined' && (window as any).parent !== window) {
+      // Try to access Farcaster SDK from parent frame
+      const farcasterSdk = (window as any).parent?.farcaster;
+      if (farcasterSdk?.haptics) {
+        farcasterSdk.haptics.impactOccurred(type).catch(() => {
+          // Fallback to browser vibration if Farcaster haptics fail
+          fallbackVibration(type);
+        });
+        return;
+      }
+    }
+
+    // Fallback to browser vibration API
+    fallbackVibration(type);
+  } catch (error) {
+    // Silent fallback - haptics are not critical functionality
+    console.debug('Haptic feedback not available:', error);
+  }
+}
+
+function fallbackVibration(type: 'light' | 'medium' | 'heavy') {
+  const vibrationPattern = type === 'heavy' ? 100 : type === 'medium' ? 75 : 50;
+  if (
+    typeof window !== 'undefined' &&
+    'navigator' in window &&
+    'vibrate' in navigator
+  ) {
+    navigator.vibrate(vibrationPattern);
+  }
+}
 
 const iconsByType: Record<'success' | 'error' | 'info', ReactNode> = {
   success: <CheckCircleFillIcon />,
@@ -18,13 +53,21 @@ export function toast(props: Omit<ToastProps, 'id'>) {
   ));
 }
 
-// Add convenience methods
-toast.success = (description: string) =>
-  toast({ type: 'success', description });
-toast.error = (description: string) => toast({ type: 'error', description });
-toast.info = (description: string) => toast({ type: 'info', description });
+// Add convenience methods with haptic feedback
+toast.success = (description: string) => {
+  triggerHaptic('medium'); // Success gets medium haptic feedback
+  return toast({ type: 'success', description });
+};
+toast.error = (description: string) => {
+  triggerHaptic('heavy'); // Error gets heavy haptic feedback
+  return toast({ type: 'error', description });
+};
+toast.info = (description: string) => {
+  triggerHaptic('light'); // Info gets light haptic feedback
+  return toast({ type: 'info', description });
+};
 
-// Add promise method for loading states
+// Add promise method for loading states with haptic feedback
 toast.promise = <T,>(
   promise: Promise<T>,
   options: {
@@ -33,8 +76,11 @@ toast.promise = <T,>(
     error: string | ((error: any) => string);
   },
 ) => {
-  // Show loading toast
-  toast.info(options.loading);
+  // Show loading toast with light haptic
+  triggerHaptic('light');
+  const loadingToast = sonnerToast.custom((id) => (
+    <Toast id={id} type="info" description={options.loading} />
+  ));
 
   return promise
     .then((data) => {
@@ -42,7 +88,10 @@ toast.promise = <T,>(
         typeof options.success === 'function'
           ? options.success(data)
           : options.success;
-      toast.success(successMessage);
+      triggerHaptic('medium'); // Success haptic
+      sonnerToast.custom((id) => (
+        <Toast id={id} type="success" description={successMessage} />
+      ));
       return data;
     })
     .catch((error) => {
@@ -50,28 +99,19 @@ toast.promise = <T,>(
         typeof options.error === 'function'
           ? options.error(error)
           : options.error;
-      toast.error(errorMessage);
+      triggerHaptic('heavy'); // Error haptic
+      sonnerToast.custom((id) => (
+        <Toast id={id} type="error" description={errorMessage} />
+      ));
       throw error;
     });
 };
 
 function Toast(props: ToastProps) {
   const { id, type, description } = props;
-  const { triggerHaptic } = useFarcaster();
 
   const descriptionRef = useRef<HTMLDivElement>(null);
   const [multiLine, setMultiLine] = useState(false);
-
-  // Trigger haptic feedback when toast appears - different intensity for different types
-  useEffect(() => {
-    if (type === 'success') {
-      triggerHaptic('medium'); // Success gets medium haptic feedback
-    } else if (type === 'error') {
-      triggerHaptic('heavy'); // Error gets heavy haptic feedback
-    } else if (type === 'info') {
-      triggerHaptic('light'); // Info gets light haptic feedback
-    }
-  }, [type, triggerHaptic]);
 
   useEffect(() => {
     const el = descriptionRef.current;
