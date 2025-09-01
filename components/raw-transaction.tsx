@@ -15,6 +15,8 @@ import { Loader } from '@/components/elements/loader';
 import { executeRawTransaction } from '@/lib/thirdweb-actions';
 import { toast } from 'sonner';
 import {
+  AccountAvatar,
+  AccountName,
   TransactionButton,
   useActiveAccount,
   useReadContract,
@@ -27,7 +29,13 @@ import { AlertTriangle, CheckCircle, ExternalLink } from 'lucide-react';
 import { getBlockExplorerUrl, getChainName } from '@/lib/utils';
 import { ContractAddressDisplay } from '@/components/contract-address-display';
 import { shortenAddress } from 'thirdweb/utils';
-import { TokenProvider, TokenSymbol } from 'thirdweb/react';
+import {
+  TokenProvider,
+  TokenSymbol,
+  TokenName,
+  AccountProvider,
+  AccountAddress,
+} from 'thirdweb/react';
 
 interface RawTransactionProps {
   transactionData: {
@@ -52,6 +60,32 @@ interface RawTransactionProps {
   };
 }
 
+// Helper function to decode ERC-20 transfer data
+function decodeTransferData(
+  data: string,
+): { recipient: string; amount: string } | null {
+  try {
+    // ERC-20 transfer function signature: transfer(address,uint256)
+    // Method ID: 0xa9059cbb
+    if (!data.startsWith('0xa9059cbb') || data.length !== 138) {
+      return null;
+    }
+
+    // Extract recipient address (32 bytes, but address is last 20 bytes)
+    const recipientHex = data.slice(34, 74); // Skip method ID (8 chars) + padding (24 chars)
+    const recipient = `0x${recipientHex}`;
+
+    // Extract amount (32 bytes)
+    const amountHex = data.slice(74, 138);
+    const amount = BigInt(`0x${amountHex}`).toString();
+
+    return { recipient, amount };
+  } catch (error) {
+    console.error('Error decoding transfer data:', error);
+    return null;
+  }
+}
+
 export function RawTransaction({ transactionData }: RawTransactionProps) {
   const [isExecuting, setIsExecuting] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
@@ -59,6 +93,21 @@ export function RawTransaction({ transactionData }: RawTransactionProps) {
   const [isApproved, setIsApproved] = useState(false);
   const [isCheckingApproval, setIsCheckingApproval] = useState(false);
   const activeAccount = useActiveAccount();
+
+  // Decode transfer data if this is an ERC-20 transfer
+  const transferData =
+    transactionData.transaction.function === 'transfer'
+      ? decodeTransferData(transactionData.transaction.data)
+      : null;
+
+  // Get token decimals for transfer transactions
+  const transferTokenContract = transferData
+    ? getContract({
+        client,
+        chain: defineChain(transactionData.transaction.chain_id),
+        address: transactionData.transaction.to as `0x${string}`,
+      })
+    : null;
 
   // Check if this is a token swap (not native ETH)
   const isTokenSwap =
@@ -112,6 +161,14 @@ export function RawTransaction({ transactionData }: RawTransactionProps) {
       : { contract: dummyContract },
   );
 
+  // Get decimals for transfer token
+  const transferTokenDecimals = useReadContract(
+    decimals,
+    transferTokenContract
+      ? { contract: transferTokenContract }
+      : { contract: dummyContract },
+  );
+
   const currentAllowance = shouldFetchAllowance
     ? allowanceResult.data
     : undefined;
@@ -161,6 +218,29 @@ export function RawTransaction({ transactionData }: RawTransactionProps) {
         ? Number(tokenDecimals)
         : 18;
 
+    const value = BigInt(amount);
+    const divisor = BigInt(10 ** decimalsToUse);
+    const wholePart = value / divisor;
+    const fractionalPart = value % divisor;
+
+    if (fractionalPart === BigInt(0)) {
+      return wholePart.toString();
+    }
+
+    const fractionalStr = fractionalPart
+      .toString()
+      .padStart(decimalsToUse, '0');
+    const trimmedFractional = fractionalStr.replace(/0+$/, '');
+
+    return `${wholePart.toString()}.${trimmedFractional}`;
+  };
+
+  // Format amount specifically for transfers using transfer token decimals
+  const formatTransferAmount = (amount: string) => {
+    const decimalsToUse =
+      typeof transferTokenDecimals.data === 'number'
+        ? transferTokenDecimals.data
+        : 18;
     const value = BigInt(amount);
     const divisor = BigInt(10 ** decimalsToUse);
     const wholePart = value / divisor;
@@ -258,10 +338,13 @@ export function RawTransaction({ transactionData }: RawTransactionProps) {
     <Card className="w-full max-w-md">
       <CardHeader>
         <CardTitle>
-          {transactionData.action === 'sell'
-            ? 'Sell Transaction'
-            : 'Transaction'}{' '}
-          - {transactionData.transaction.function}
+          {transactionData.transaction.function === 'transfer'
+            ? 'Token Transfer'
+            : transactionData.action === 'sell'
+              ? 'Sell Transaction'
+              : 'Transaction'}{' '}
+          {transactionData.transaction.function !== 'transfer' &&
+            `- ${transactionData.transaction.function}`}
         </CardTitle>
         <CardDescription>
           Review and execute the blockchain transaction below.
@@ -320,6 +403,70 @@ export function RawTransaction({ transactionData }: RawTransactionProps) {
             </div>
           </div>
         )}
+
+        {/* Transfer Details */}
+        {transactionData.transaction.function === 'transfer' &&
+          transferData && (
+            <div className="space-y-2">
+              <p className="text-sm font-medium">Transfer Details:</p>
+              <div className="p-3 bg-muted rounded-lg space-y-3">
+                {/* Token Being Transferred */}
+                <div className="flex items-center justify-between">
+                  <span className="text-sm">Token:</span>
+                  <div className="text-right">
+                    <TokenProvider
+                      address={transactionData.transaction.to}
+                      chain={defineChain(transactionData.transaction.chain_id)}
+                      client={client}
+                    >
+                      <p className="text-sm font-medium">
+                        <TokenName loadingComponent={<span>Loading...</span>} />
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        <TokenSymbol />
+                      </p>
+                    </TokenProvider>
+                  </div>
+                </div>
+
+                {/* Amount */}
+                <div className="flex items-center justify-between">
+                  <span className="text-sm">Amount:</span>
+                  <div className="text-right">
+                    <TokenProvider
+                      address={transactionData.transaction.to}
+                      chain={defineChain(transactionData.transaction.chain_id)}
+                      client={client}
+                    >
+                      <p className="text-sm font-medium">
+                        {formatTransferAmount(transferData.amount)}{' '}
+                        <TokenSymbol />
+                      </p>
+                    </TokenProvider>
+                  </div>
+                </div>
+
+                {/* Recipient */}
+                <div className="flex items-center justify-between">
+                  <span className="text-sm">To:</span>
+                  <div className="text-right">
+                    <AccountProvider
+                      address={transferData.recipient}
+                      client={client}
+                    >
+                      <div className="flex items-center gap-2">
+                        <AccountAvatar className="rounded-full w-5 h-5" />
+                        <AccountName className="text-sm font-medium" />
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        <AccountAddress formatFn={shortenAddress} />
+                      </p>
+                    </AccountProvider>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
         {/* Contract Details */}
         <div className="space-y-2">
@@ -453,8 +600,10 @@ export function RawTransaction({ transactionData }: RawTransactionProps) {
                     <CheckCircle className="mr-2 h-4 w-4" />
                     Waiting for Approval...
                   </>
+                ) : transactionData.transaction.function === 'transfer' ? (
+                  'Sign & Execute Transfer'
                 ) : (
-                  'Sign & Execute Swap'
+                  'Sign & Execute Transaction'
                 )}
               </TransactionButton>
             )}
@@ -471,6 +620,8 @@ export function RawTransaction({ transactionData }: RawTransactionProps) {
                 <Loader className="mr-2" />
                 Executing Transaction...
               </>
+            ) : transactionData.transaction.function === 'transfer' ? (
+              'Sign & Execute Transfer'
             ) : (
               'Sign & Execute Transaction'
             )}
