@@ -5,8 +5,9 @@ import { createGuestUser, getUser } from '@/lib/db/queries';
 import { authConfig } from './auth.config';
 import { DUMMY_PASSWORD } from '@/lib/constants';
 import type { DefaultJWT } from 'next-auth/jwt';
+import { handleEthereumLogin } from '@/lib/auth-ethereum';
 
-export type UserType = 'guest' | 'regular';
+export type UserType = 'guest' | 'regular' | 'ethereum';
 
 declare module 'next-auth' {
   interface Session extends DefaultSession {
@@ -68,6 +69,32 @@ export const {
       async authorize() {
         const [guestUser] = await createGuestUser();
         return { ...guestUser, type: 'guest' };
+      },
+    }),
+    Credentials({
+      id: 'ethereum',
+      credentials: {
+        address: { type: 'text' },
+        signature: { type: 'text' },
+        message: { type: 'text' },
+      },
+      async authorize({ address, signature, message }: any) {
+        if (!address || !signature || !message) {
+          console.log('Missing required fields for Ethereum auth');
+          return null;
+        }
+
+        const result = await handleEthereumLogin({
+          address,
+          signature,
+          message,
+        });
+
+        if (!result.success || !result.user) {
+          return null;
+        }
+
+        return { ...result.user, type: 'ethereum' };
       },
     }),
   ],

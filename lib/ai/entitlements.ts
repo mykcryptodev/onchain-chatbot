@@ -32,6 +32,18 @@ export const entitlementsByUserType: Record<UserType, Entitlements> = {
   },
 
   /*
+   * For users authenticated with Ethereum wallet
+   */
+  ethereum: {
+    maxMessagesPerDay: 100,
+    availableChatModelIds: [
+      'chat-model',
+      'chat-model-reasoning',
+      'thirdweb-ai',
+    ],
+  },
+
+  /*
    * TODO: For users with an account and a paid membership
    */
 };

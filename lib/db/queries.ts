@@ -63,6 +63,46 @@ export async function createUser(email: string, password: string) {
   }
 }
 
+export async function getUserByWallet(
+  walletAddress: string,
+): Promise<Array<User>> {
+  try {
+    console.log('getUserByWallet called with:', walletAddress);
+    const result = await db
+      .select()
+      .from(user)
+      .where(eq(user.walletAddress, walletAddress.toLowerCase()));
+    console.log('getUserByWallet result:', result);
+    return result;
+  } catch (error) {
+    console.error('Database error in getUserByWallet:', error);
+    throw new ChatSDKError(
+      'bad_request:database',
+      'Failed to get user by wallet address',
+    );
+  }
+}
+
+export async function createUserWithWallet(
+  email: string,
+  walletAddress: string,
+) {
+  try {
+    return await db
+      .insert(user)
+      .values({
+        email,
+        walletAddress: walletAddress.toLowerCase(), // Store lowercase for consistency
+      })
+      .returning();
+  } catch (error) {
+    throw new ChatSDKError(
+      'bad_request:database',
+      'Failed to create user with wallet',
+    );
+  }
+}
+
 export async function createGuestUser() {
   const email = `guest-${Date.now()}`;
   const password = generateHashedPassword(generateUUID());
