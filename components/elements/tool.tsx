@@ -24,7 +24,7 @@ export type ToolProps = ComponentProps<typeof Collapsible>;
 export const Tool = ({ className, ...props }: ToolProps) => (
   <Collapsible
     className={cn(
-      'not-prose mb-4 w-full max-w-full rounded-md border overflow-hidden',
+      'not-prose mb-4 w-full max-w-full rounded-md border overflow-hidden min-w-0',
       className,
     )}
     {...props}
@@ -104,14 +104,11 @@ export type ToolInputProps = ComponentProps<'div'> & {
 };
 
 export const ToolInput = ({ className, input, ...props }: ToolInputProps) => (
-  <div
-    className={cn('space-y-2 overflow-hidden p-2 sm:p-4', className)}
-    {...props}
-  >
-    <h4 className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
+  <div className={cn('space-y-2 p-2 sm:p-4 text-left', className)} {...props}>
+    <h4 className="font-medium text-muted-foreground text-xs uppercase tracking-wide text-left">
       Parameters
     </h4>
-    <div className="rounded-md bg-muted/50 overflow-x-auto">
+    <div className="rounded-md bg-muted/50 overflow-x-auto text-left">
       <CodeBlock code={JSON.stringify(input, null, 2)} language="json" />
     </div>
   </div>
@@ -133,20 +130,22 @@ export const ToolOutput = ({
   }
 
   return (
-    <div className={cn('space-y-2 p-2 sm:p-4', className)} {...props}>
-      <h4 className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
+    <div className={cn('space-y-2 p-2 sm:p-4 text-left', className)} {...props}>
+      <h4 className="font-medium text-muted-foreground text-xs uppercase tracking-wide text-left">
         {errorText ? 'Error' : 'Result'}
       </h4>
       <div
         className={cn(
-          'overflow-x-auto rounded-md text-xs [&_table]:w-full min-w-0',
+          'overflow-x-auto rounded-md text-xs [&_table]:w-full text-left',
           errorText
             ? 'bg-destructive/10 text-destructive'
             : 'bg-muted/50 text-foreground',
         )}
       >
-        {errorText && <div className="break-words">{errorText}</div>}
-        {output && <div className="min-w-0">{output}</div>}
+        {errorText && (
+          <div className="break-words p-3 text-left">{errorText}</div>
+        )}
+        {output && <div className="text-left">{output}</div>}
       </div>
     </div>
   );

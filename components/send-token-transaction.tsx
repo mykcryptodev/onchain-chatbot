@@ -123,7 +123,7 @@ export function SendTokenTransaction({ sendData }: SendTokenTransactionProps) {
 
   if (isCompleted && transactionResult) {
     return (
-      <Card className="w-full max-w-[calc(100vw-1rem)] sm:max-w-lg md:max-w-xl lg:max-w-2xl mx-auto">
+      <Card className="w-full max-w-full">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
             <span className="text-green-600">✓</span>
@@ -170,7 +170,7 @@ export function SendTokenTransaction({ sendData }: SendTokenTransactionProps) {
   }
 
   return (
-    <Card className="w-full max-w-[calc(100vw-1rem)] sm:max-w-lg md:max-w-xl lg:max-w-2xl mx-auto">
+    <Card className="w-full max-w-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
           <Send className="size-4" />

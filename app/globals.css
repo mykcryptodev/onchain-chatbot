@@ -135,6 +135,22 @@
             overflow-x: hidden;
         }
     }
+
+    /* Toast-specific responsive improvements */
+    @media (max-width: 599px) {
+        /* Below toast-mobile breakpoint */
+        [data-testid="toast"] {
+            margin: 0 0.5rem;
+            max-width: calc(100vw - 1rem);
+        }
+    }
+
+    @media (min-width: 600px) {
+        /* Above toast-mobile breakpoint */
+        [data-testid="toast"] {
+            max-width: min(90vw, 800px);
+        }
+    }
 }
 
 .skeleton {

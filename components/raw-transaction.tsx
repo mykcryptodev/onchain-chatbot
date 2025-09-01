@@ -287,7 +287,7 @@ export function RawTransaction({ transactionData }: RawTransactionProps) {
 
   if (isCompleted && transactionResult) {
     return (
-      <Card className="w-full max-w-[calc(100vw-1rem)] sm:max-w-lg md:max-w-xl lg:max-w-2xl mx-auto">
+      <Card className="w-full max-w-[calc(100vw-1rem)] sm:max-w-lg md:max-w-xl lg:max-w-2xl">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
             <span className="text-green-600">✓</span>
@@ -335,7 +335,7 @@ export function RawTransaction({ transactionData }: RawTransactionProps) {
   }
 
   return (
-    <Card className="w-full max-w-[calc(100vw-1rem)] sm:max-w-lg md:max-w-xl lg:max-w-2xl mx-auto">
+    <Card className="w-full max-w-[calc(100vw-1rem)] sm:max-w-lg md:max-w-xl lg:max-w-2xl">
       <CardHeader>
         <CardTitle className="text-sm sm:text-base">
           {transactionData.transaction.function === 'transfer'

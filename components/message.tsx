@@ -78,7 +78,7 @@ const PurePreviewMessage = ({
           'mx-auto w-full group/message overflow-hidden',
           hasToolParts
             ? 'px-1 sm:px-4 max-w-full'
-            : 'px-2 sm:px-4 max-w-full sm:max-w-3xl',
+            : 'px-2 sm:px-4 max-w-full sm:max-w-[640px]',
         )}
         initial={{ y: 5, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -94,7 +94,7 @@ const PurePreviewMessage = ({
           )}
         >
           {message.role === 'assistant' && (
-            <div className="flex justify-center items-center rounded-full ring-1 size-8 shrink-0 ring-border bg-background">
+            <div className="hidden sm:flex justify-center items-center rounded-full ring-1 size-8 shrink-0 ring-border bg-background">
               <div className="translate-y-px">
                 <SparklesIcon size={14} />
               </div>
@@ -653,7 +653,7 @@ export const ThinkingMessage = () => {
   return (
     <motion.div
       data-testid="message-assistant-loading"
-      className="px-2 sm:px-4 mx-auto w-full max-w-full sm:max-w-3xl group/message min-h-96"
+      className="px-2 sm:px-4 mx-auto w-full max-w-full sm:max-w-[640px] group/message min-h-96"
       initial={{ y: 5, opacity: 0 }}
       animate={{ y: 0, opacity: 1, transition: { delay: 1 } }}
       data-role={role}

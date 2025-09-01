@@ -100,7 +100,7 @@ export function SwapTransaction({ swapData }: SwapTransactionProps) {
 
   if (isCompleted && transactionResult) {
     return (
-      <Card className="w-full max-w-[calc(100vw-1rem)] sm:max-w-lg md:max-w-xl lg:max-w-2xl mx-auto">
+      <Card className="w-full max-w-full overflow-x-auto">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
             <span className="text-green-600">✓</span>
@@ -147,7 +147,7 @@ export function SwapTransaction({ swapData }: SwapTransactionProps) {
   }
 
   return (
-    <Card className="w-full max-w-[calc(100vw-1rem)] sm:max-w-lg md:max-w-xl lg:max-w-2xl mx-auto">
+    <Card className="w-full max-w-full">
       <CardHeader>
         <CardTitle className="text-sm sm:text-base">
           Token Swap Transaction
