@@ -103,7 +103,7 @@ export function MessageEditor({
 
             setMode('view');
             // Trigger haptic feedback when regenerating
-            triggerHaptic('medium');
+            triggerHaptic(); // Use default like sidebar
             regenerate();
           }}
         >
