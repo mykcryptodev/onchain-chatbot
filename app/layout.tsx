@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     siteName: 'Onchain Chatbot',
     images: [
       {
-        url: '/opengraph-image.png',
+        url: '/api/og?title=Onchain%20Chatbot&subtitle=AI%20Assistant%20for%20Web3&theme=dark',
         width: 1200,
         height: 630,
         alt: 'Onchain Chatbot - AI Assistant for Web3',
@@ -35,12 +35,15 @@ export const metadata: Metadata = {
     title: 'Onchain Chatbot - AI Assistant for Web3',
     description:
       'An intelligent AI chatbot for blockchain interactions, token swaps, and onchain operations.',
-    images: ['/opengraph-image.png'],
+    images: [
+      '/api/og?title=Onchain%20Chatbot&subtitle=AI%20Assistant%20for%20Web3&theme=dark',
+    ],
   },
   other: {
     'fc:miniapp': JSON.stringify({
       version: '1',
-      imageUrl: 'https://chat.vercel.ai/opengraph-image.png',
+      imageUrl:
+        'https://onchain-chatbot.vercel.app/api/og?title=Onchain%20Chatbot&subtitle=AI%20Assistant%20for%20Web3&theme=dark',
       button: {
         title: '🤖 Start Chat',
         action: {
