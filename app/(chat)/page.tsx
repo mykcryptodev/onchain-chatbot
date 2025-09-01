@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   other: {
     'fc:miniapp': JSON.stringify({
       version: '1',
-      imageUrl: 'https://chat.vercel.ai/opengraph-image.png',
+      imageUrl: 'https://onchain-chatbot.vercel.app/opengraph-image.png',
       button: {
         title: '🤖 Start Chat',
         action: {

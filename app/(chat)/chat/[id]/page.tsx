@@ -36,13 +36,13 @@ export async function generateMetadata(props: {
     other: {
       'fc:miniapp': JSON.stringify({
         version: '1',
-        imageUrl: 'https://chat.vercel.ai/opengraph-image.png',
+        imageUrl: 'https://onchain-chatbot.vercel.app/opengraph-image.png',
         button: {
           title: '💬 Continue Chat',
           action: {
             type: 'launch_frame',
             name: 'Onchain Chatbot',
-            url: `https://chat.vercel.ai/chat/${id}`,
+            url: `https://onchain-chatbot.vercel.app/chat/${id}`,
           },
         },
       }),

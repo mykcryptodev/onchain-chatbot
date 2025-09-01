@@ -10,7 +10,7 @@ import { FarcasterProvider } from '@/components/farcaster-provider';
 import { ToastProvider } from '@/components/toast';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://chat.vercel.ai'),
+  metadataBase: new URL('https://onchain-chatbot.vercel.app'),
   title: 'Onchain Chatbot - AI Assistant for Web3',
   description:
     'An intelligent AI chatbot for blockchain interactions, token swaps, and onchain operations.',
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     title: 'Onchain Chatbot - AI Assistant for Web3',
     description:
       'An intelligent AI chatbot for blockchain interactions, token swaps, and onchain operations.',
-    url: 'https://chat.vercel.ai',
+    url: 'https://onchain-chatbot.vercel.app',
     siteName: 'Onchain Chatbot',
     images: [
       {
