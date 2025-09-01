@@ -33,6 +33,8 @@ import { ArrowDown } from 'lucide-react';
 import { useScrollToBottom } from '@/hooks/use-scroll-to-bottom';
 import type { VisibilityType } from './visibility-selector';
 import type { Attachment, ChatMessage } from '@/lib/types';
+import type { Session } from 'next-auth';
+import { SharedConnectButton } from '@/components/shared-connect-button';
 
 function PureMultimodalInput({
   chatId,
@@ -49,6 +51,7 @@ function PureMultimodalInput({
   selectedVisibilityType,
   selectedChains,
   setSelectedChains,
+  session,
 }: {
   chatId: string;
   input: string;
@@ -64,9 +67,13 @@ function PureMultimodalInput({
   selectedVisibilityType: VisibilityType;
   selectedChains: number[];
   setSelectedChains: Dispatch<SetStateAction<number[]>>;
+  session: Session | null;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { width } = useWindowSize();
+
+  // Check if user is authenticated
+  const isAuthenticated = !!session?.user;
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -331,6 +338,8 @@ function PureMultimodalInput({
           </PromptInputTools>
           {status === 'submitted' ? (
             <StopButton stop={stop} setMessages={setMessages} />
+          ) : !isAuthenticated ? (
+            <SignInButton />
           ) : (
             <PromptInputSubmit
               status={status}
@@ -355,6 +364,7 @@ export const MultimodalInput = memo(
       return false;
     if (!equal(prevProps.selectedChains, nextProps.selectedChains))
       return false;
+    if (prevProps.session !== nextProps.session) return false;
 
     return true;
   },
@@ -408,6 +418,28 @@ function PureStopButton({
 }
 
 const StopButton = memo(PureStopButton);
+
+function PureSignInButton() {
+  return (
+    <SharedConnectButton
+      className="h-8"
+      connectButtonProps={{
+        label: 'Sign in to chat',
+        style: {
+          fontSize: '12px',
+          padding: '6px 12px',
+          height: '32px',
+          minHeight: '32px',
+          borderRadius: '6px',
+          width: 'auto',
+          minWidth: 'fit-content',
+        },
+      }}
+    />
+  );
+}
+
+const SignInButton = memo(PureSignInButton);
 
 function PureSendButton({
   submitForm,

@@ -173,6 +173,7 @@ export function Chat({
               selectedVisibilityType={visibilityType}
               selectedChains={selectedChains}
               setSelectedChains={setSelectedChains}
+              session={session}
             />
           )}
         </div>
@@ -195,6 +196,7 @@ export function Chat({
         selectedVisibilityType={visibilityType}
         selectedChains={selectedChains}
         setSelectedChains={setSelectedChains}
+        session={session}
       />
     </>
   );

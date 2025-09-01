@@ -13,6 +13,8 @@
     "buttonTitle": "🤖 Chat",
     "splashImageUrl": "https://onchain-chatbot.vercel.app/favicon.ico",
     "splashBackgroundColor": "#000000",
-    "webhookUrl": "https://onchain-chatbot.vercel.app/api/webhook"
+    "webhookUrl": "https://onchain-chatbot.vercel.app/api/webhook",
+    "primaryCategory": "utility",
+    "tags": ["ai", "chatbot", "chatgpt", "agent"]
   }
 }

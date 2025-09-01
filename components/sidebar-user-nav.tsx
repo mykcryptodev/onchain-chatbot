@@ -1,25 +1,14 @@
 'use client';
 
 import { useTheme } from 'next-themes';
-import { ConnectButton } from 'thirdweb/react';
-import { client } from '@/providers/Thirdweb';
-import { signOut, useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { SidebarMenu, SidebarMenuItem } from '@/components/ui/sidebar';
 import { Switch } from '@/components/ui/switch';
-import {
-  isLoggedIn,
-  generatePayload,
-  loginWithEthereum,
-} from '@/app/(auth)/actions';
-import { base } from 'thirdweb/chains';
+import { SharedConnectButton } from '@/components/shared-connect-button';
 
 export function SidebarUserNav() {
   const { setTheme, resolvedTheme } = useTheme();
-  const { update: updateSession } = useSession();
-  const router = useRouter();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -45,36 +34,7 @@ export function SidebarUserNav() {
           </div>
 
           {/* Connect Button */}
-          <ConnectButton
-            client={client}
-            theme={mounted && resolvedTheme === 'light' ? 'light' : 'dark'}
-            auth={{
-              isLoggedIn: async (address) => {
-                try {
-                  const result = await isLoggedIn(address);
-                  return Boolean(result);
-                } catch (error) {
-                  console.error('Error in ConnectButton isLoggedIn:', error);
-                  return false;
-                }
-              },
-              doLogin: async (params) => {
-                await loginWithEthereum(params);
-
-                // Give NextAuth a moment to set the session cookie
-                await new Promise((resolve) => setTimeout(resolve, 100));
-
-                // Force session update after login
-                await updateSession();
-                router.refresh();
-              },
-              getLoginPayload: async ({ address }) =>
-                generatePayload({ address }),
-              doLogout: async () => {
-                await signOut({ redirectTo: '/' });
-              },
-            }}
-          />
+          <SharedConnectButton waitForMount={true} />
         </div>
       </SidebarMenuItem>
     </SidebarMenu>

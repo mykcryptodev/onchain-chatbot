@@ -28,6 +28,7 @@ import equal from 'fast-deep-equal';
 import type { UseChatHelpers } from '@ai-sdk/react';
 import type { VisibilityType } from './visibility-selector';
 import type { Attachment, ChatMessage } from '@/lib/types';
+import type { Session } from 'next-auth';
 
 export const artifactDefinitions = [
   textArtifact,
@@ -69,6 +70,7 @@ function PureArtifact({
   selectedVisibilityType,
   selectedChains,
   setSelectedChains,
+  session,
 }: {
   chatId: string;
   input: string;
@@ -86,6 +88,7 @@ function PureArtifact({
   selectedVisibilityType: VisibilityType;
   selectedChains: number[];
   setSelectedChains: Dispatch<SetStateAction<number[]>>;
+  session: Session | null;
 }) {
   const { artifact, setArtifact, metadata, setMetadata } = useArtifact();
 
@@ -342,6 +345,7 @@ function PureArtifact({
                     selectedVisibilityType={selectedVisibilityType}
                     selectedChains={selectedChains}
                     setSelectedChains={setSelectedChains}
+                    session={session}
                   />
                 </div>
               </div>
@@ -512,6 +516,7 @@ export const Artifact = memo(PureArtifact, (prevProps, nextProps) => {
   if (!equal(prevProps.messages, nextProps.messages.length)) return false;
   if (prevProps.selectedVisibilityType !== nextProps.selectedVisibilityType)
     return false;
+  if (prevProps.session !== nextProps.session) return false;
 
   return true;
 });
