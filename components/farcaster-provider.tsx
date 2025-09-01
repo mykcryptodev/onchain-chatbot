@@ -104,21 +104,10 @@ export function FarcasterProvider({ children }: { children: React.ReactNode }) {
   const triggerHaptic = useCallback(
     (type: 'light' | 'medium' | 'heavy' = 'light') => {
       // Use Farcaster SDK haptics with fallback to browser API
-      console.debug('Triggering haptic:', {
-        type,
-        isInFarcaster,
-        hasSDK: !!sdk,
-        hasHaptics: !!sdk?.haptics,
-      });
       try {
         if (isInFarcaster && sdk?.haptics) {
           // Use impact feedback for interactions with different intensities
-          console.debug('Using Farcaster SDK haptics');
           sdk.haptics.impactOccurred(type).catch((error) => {
-            console.debug(
-              'Farcaster haptics failed, falling back to browser vibration:',
-              error,
-            );
             // Fallback to browser vibration API if SDK haptics fail
             const vibrationPattern =
               type === 'heavy' ? 100 : type === 'medium' ? 75 : 50;
@@ -132,7 +121,6 @@ export function FarcasterProvider({ children }: { children: React.ReactNode }) {
           });
         } else {
           // Fallback to browser vibration API if not in Farcaster
-          console.debug('Using browser vibration API fallback');
           const vibrationPattern =
             type === 'heavy' ? 100 : type === 'medium' ? 75 : 50;
           if (
@@ -140,15 +128,11 @@ export function FarcasterProvider({ children }: { children: React.ReactNode }) {
             'navigator' in window &&
             'vibrate' in navigator
           ) {
-            console.debug('Vibrating with pattern:', vibrationPattern);
             navigator.vibrate(vibrationPattern);
-          } else {
-            console.debug('Browser vibration not supported');
           }
         }
       } catch (error) {
         // Silent fallback - haptics are not critical functionality
-        console.debug('Haptic feedback not available:', error);
       }
     },
     [isInFarcaster, sdk],
@@ -172,6 +156,7 @@ export function FarcasterProvider({ children }: { children: React.ReactNode }) {
 
 export function useFarcaster() {
   const context = useContext(FarcasterContext);
+
   if (context === undefined) {
     // Instead of throwing an error that can cause 500 errors during SSR,
     // provide a default context with safe fallbacks

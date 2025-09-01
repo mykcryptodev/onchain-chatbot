@@ -24,7 +24,7 @@ export const metadata: Metadata = {
       {
         url: '/api/og?title=Onchain%20Chatbot&subtitle=AI%20Assistant%20for%20Web3&theme=dark',
         width: 1200,
-        height: 630,
+        height: 800,
         alt: 'Onchain Chatbot - AI Assistant for Web3',
       },
     ],

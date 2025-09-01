@@ -34,7 +34,7 @@ export default function OGTestPage() {
                 src={testCase.url}
                 alt={`OG Image: ${testCase.title}`}
                 className="w-full max-w-2xl mx-auto border rounded shadow-lg"
-                style={{ aspectRatio: '1200/630' }}
+                style={{ aspectRatio: '1200/800' }}
               />
             </div>
             <p className="text-sm text-gray-600 mt-2 font-mono break-all">
