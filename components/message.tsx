@@ -19,6 +19,7 @@ import { PreviewAttachment } from './preview-attachment';
 import { Weather } from './weather';
 import { SwapTransaction } from './swap-transaction';
 import { RawTransaction } from './raw-transaction';
+import { SendTokenTransaction } from './send-token-transaction';
 import equal from 'fast-deep-equal';
 import { cn, sanitizeText } from '@/lib/utils';
 import { Button } from './ui/button';
@@ -301,6 +302,136 @@ const PurePreviewMessage = ({
                 typeof type === 'string' &&
                 type.includes('tool-sign_transaction')
               ) {
+                // Type guard to ensure we have a tool part
+                if ('toolCallId' in part && 'state' in part) {
+                  const { toolCallId, state } = part;
+
+                  return (
+                    <Tool
+                      key={toolCallId || `${message.id}-${index}`}
+                      defaultOpen={true}
+                    >
+                      <ToolHeader
+                        type="tool-sign_transaction"
+                        state={state || 'output-available'}
+                      />
+                      <ToolContent>
+                        {(state === 'input-available' ||
+                          state === 'input-streaming') &&
+                          'input' in part && (
+                            <>
+                              <ToolInput input={part.input} />
+                              {/* Show transaction UI from input if it contains transaction data */}
+                              {part.input &&
+                                typeof part.input === 'object' &&
+                                ((('chain_id' in part.input ||
+                                  'chainId' in part.input) &&
+                                  'to' in part.input &&
+                                  'data' in part.input) ||
+                                  ('transaction' in part.input &&
+                                    'action' in part.input)) && (
+                                  <ToolOutput
+                                    output={
+                                      <RawTransaction
+                                        transactionData={
+                                          'transaction' in part.input
+                                            ? (part.input as any)
+                                            : {
+                                                transaction: {
+                                                  chain_id:
+                                                    (part.input as any)
+                                                      .chain_id ||
+                                                    (part.input as any).chainId,
+                                                  function:
+                                                    (part.input as any)
+                                                      .function ||
+                                                    'transaction',
+                                                  to: (part.input as any).to,
+                                                  value:
+                                                    (part.input as any).value ||
+                                                    '0x0',
+                                                  data: (part.input as any)
+                                                    .data,
+                                                },
+                                                action:
+                                                  (part.input as any)
+                                                    .function || 'transaction',
+                                                intent: (part.input as any)
+                                                  .intent,
+                                              }
+                                        }
+                                      />
+                                    }
+                                    errorText={undefined}
+                                  />
+                                )}
+                            </>
+                          )}
+                        {state === 'output-available' && 'result' in part && (
+                          <ToolOutput
+                            output={
+                              <div className="space-y-2">
+                                {/* Try to detect transaction type and format appropriately */}
+                                {part.result &&
+                                typeof part.result === 'object' &&
+                                ('chain_id' in part.result ||
+                                  'chainId' in part.result) &&
+                                'to' in part.result &&
+                                'data' in part.result ? (
+                                  <RawTransaction
+                                    transactionData={{
+                                      transaction: {
+                                        chain_id:
+                                          (part.result as any).chain_id ||
+                                          (part.result as any).chainId,
+                                        function:
+                                          (part.result as any).function ||
+                                          'transaction',
+                                        to: (part.result as any).to,
+                                        value:
+                                          (part.result as any).value || '0x0',
+                                        data: (part.result as any).data,
+                                      },
+                                      action:
+                                        (part.result as any).function ||
+                                        'transaction',
+                                      intent: (part.result as any).intent,
+                                    }}
+                                  />
+                                ) : part.result &&
+                                  typeof part.result === 'object' &&
+                                  'recipients' in part.result &&
+                                  ('chainId' in part.result ||
+                                    'chain_id' in part.result) ? (
+                                  <SendTokenTransaction
+                                    sendData={part.result as any}
+                                  />
+                                ) : part.result &&
+                                  typeof part.result === 'object' &&
+                                  'transaction' in part.result &&
+                                  'action' in part.result ? (
+                                  <RawTransaction
+                                    transactionData={part.result as any}
+                                  />
+                                ) : (
+                                  <div className="space-y-2">
+                                    <p>Transaction data:</p>
+                                    <pre className="text-xs bg-muted p-3 rounded-lg overflow-auto">
+                                      {JSON.stringify(part.result, null, 2)}
+                                    </pre>
+                                  </div>
+                                )}
+                              </div>
+                            }
+                            errorText={undefined}
+                          />
+                        )}
+                      </ToolContent>
+                    </Tool>
+                  );
+                }
+
+                // Fallback for cases without proper tool structure
                 return (
                   <Tool key={`${message.id}-${index}`} defaultOpen={true}>
                     <ToolHeader

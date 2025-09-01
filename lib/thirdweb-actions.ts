@@ -182,6 +182,53 @@ export async function getWalletBalance({
 }
 
 /**
+ * Server action to execute a token send transaction
+ */
+export async function executeSendTokenTransaction(sendData: {
+  chainId: number;
+  recipients: Array<{
+    address: string;
+    quantity: string;
+  }>;
+  tokenAddress?: string;
+  tokenId?: string;
+}) {
+  try {
+    // Get the authenticated user
+    const session = await auth();
+    if (!session?.user) {
+      throw new Error('User not authenticated');
+    }
+
+    // Get user's wallet address from session
+    const userWalletAddress = session.user.walletAddress;
+    if (!userWalletAddress) {
+      throw new Error('No wallet address found for user');
+    }
+
+    // Execute the token send
+    const result = await thirdwebAPI.sendTokens({
+      from: userWalletAddress,
+      chainId: sendData.chainId,
+      recipients: sendData.recipients,
+      tokenAddress: sendData.tokenAddress,
+      tokenId: sendData.tokenId,
+    });
+
+    return {
+      success: true,
+      data: result,
+    };
+  } catch (error) {
+    console.error('Error executing send token transaction:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error occurred',
+    };
+  }
+}
+
+/**
  * Server action to execute a raw transaction
  */
 export async function executeRawTransaction({
