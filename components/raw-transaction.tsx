@@ -10,9 +10,15 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Loader } from '@/components/elements/loader';
 import { executeRawTransaction } from '@/lib/thirdweb-actions';
 import { toast } from 'sonner';
+import { TransactionButton, useActiveAccount } from 'thirdweb/react';
+import { prepareTransaction } from 'thirdweb';
+import { client } from '@/providers/Thirdweb';
+import { defineChain } from 'thirdweb/chains';
+import { AlertTriangle } from 'lucide-react';
 
 interface RawTransactionProps {
   transactionData: {
@@ -41,6 +47,7 @@ export function RawTransaction({ transactionData }: RawTransactionProps) {
   const [isExecuting, setIsExecuting] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   const [transactionResult, setTransactionResult] = useState<any>(null);
+  const activeAccount = useActiveAccount();
 
   const handleExecuteTransaction = async () => {
     try {
@@ -98,6 +105,19 @@ export function RawTransaction({ transactionData }: RawTransactionProps) {
       10: 'Optimism',
     };
     return chains[chainId] || `Chain ${chainId}`;
+  };
+
+  // Prepare transaction for Thirdweb SDK
+  const prepareThirdwebTransaction = () => {
+    const chain = defineChain(transactionData.transaction.chain_id);
+
+    return prepareTransaction({
+      client,
+      chain,
+      to: transactionData.transaction.to as `0x${string}`,
+      value: BigInt(transactionData.transaction.value),
+      data: transactionData.transaction.data as `0x${string}`,
+    });
   };
 
   const getTokenSymbol = (address: string) => {
@@ -233,32 +253,61 @@ export function RawTransaction({ transactionData }: RawTransactionProps) {
         </div>
 
         {/* Execute Button */}
-        <Button
-          onClick={handleExecuteTransaction}
-          disabled={isExecuting}
-          className="w-full"
-        >
-          {isExecuting ? (
-            <>
-              <Loader className="mr-2" />
-              Executing Transaction...
-            </>
-          ) : (
-            'Sign & Execute Transaction'
-          )}
-        </Button>
+        {activeAccount ? (
+          // Use Thirdweb TransactionButton when wallet is connected
+          <TransactionButton
+            transaction={prepareThirdwebTransaction}
+            onTransactionSent={(result) => {
+              toast.success('Transaction sent!');
+              console.log('Transaction sent:', result);
+            }}
+            onTransactionConfirmed={(receipt) => {
+              setTransactionResult({
+                transactionHash: receipt.transactionHash,
+                transactionId: receipt.transactionHash,
+              });
+              setIsCompleted(true);
+              toast.success('Transaction confirmed!');
+              console.log('Transaction confirmed:', receipt);
+            }}
+            onError={(error) => {
+              toast.error(`Transaction failed: ${error.message}`);
+              console.error('Transaction error:', error);
+            }}
+            className="w-full"
+          >
+            Sign & Execute Transaction
+          </TransactionButton>
+        ) : (
+          // Fallback to server action when no wallet is connected
+          <Button
+            onClick={handleExecuteTransaction}
+            disabled={isExecuting}
+            className="w-full"
+          >
+            {isExecuting ? (
+              <>
+                <Loader className="mr-2" />
+                Executing Transaction...
+              </>
+            ) : (
+              'Sign & Execute Transaction'
+            )}
+          </Button>
+        )}
 
         {/* Warning */}
-        <div className="text-xs text-muted-foreground p-3 bg-yellow-50 dark:bg-yellow-950/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
-          <p className="font-medium text-yellow-800 dark:text-yellow-200">
-            ⚠️ Important:
-          </p>
-          <p className="text-yellow-700 dark:text-yellow-300">
-            This will execute a smart contract transaction using your connected
-            wallet. Make sure you have sufficient balance and gas fees on{' '}
-            {getChainName(transactionData.transaction.chain_id)}.
-          </p>
-        </div>
+        <Alert>
+          <AlertTriangle className="h-4 w-4" />
+          <div>
+            <AlertTitle>Important</AlertTitle>
+            <AlertDescription>
+              {activeAccount
+                ? `This will execute a smart contract transaction using your connected wallet (${activeAccount.address?.slice(0, 6)}...${activeAccount.address?.slice(-4)}). Make sure you have sufficient balance and gas fees on ${getChainName(transactionData.transaction.chain_id)}.`
+                : `This will execute a smart contract transaction using your authenticated wallet. Make sure you have sufficient balance and gas fees on ${getChainName(transactionData.transaction.chain_id)}.`}
+            </AlertDescription>
+          </div>
+        </Alert>
       </CardContent>
     </Card>
   );

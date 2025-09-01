@@ -10,12 +10,14 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Loader } from '@/components/elements/loader';
 import {
   executeSwapTransaction,
   authenticateWithThirdweb,
 } from '@/lib/thirdweb-actions';
 import { toast } from 'sonner';
+import { AlertTriangle } from 'lucide-react';
 
 interface SwapTransactionProps {
   swapData: {
@@ -227,15 +229,16 @@ export function SwapTransaction({ swapData }: SwapTransactionProps) {
         </Button>
 
         {/* Warning */}
-        <div className="text-xs text-muted-foreground p-3 bg-yellow-50 dark:bg-yellow-950/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
-          <p className="font-medium text-yellow-800 dark:text-yellow-200">
-            ⚠️ Important:
-          </p>
-          <p className="text-yellow-700 dark:text-yellow-300">
-            This transaction will be executed using your connected wallet. Make
-            sure you have sufficient balance and gas fees.
-          </p>
-        </div>
+        <Alert>
+          <AlertTriangle className="h-4 w-4" />
+          <div>
+            <AlertTitle>Important</AlertTitle>
+            <AlertDescription>
+              This transaction will be executed using your connected wallet.
+              Make sure you have sufficient balance and gas fees.
+            </AlertDescription>
+          </div>
+        </Alert>
       </CardContent>
     </Card>
   );

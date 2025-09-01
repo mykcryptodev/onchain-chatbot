@@ -28,6 +28,7 @@ The integration allows users to:
 
 ### 3. `components/raw-transaction.tsx`
 - React component that renders raw blockchain transaction UI
+- **Smart wallet detection**: Uses Thirdweb `TransactionButton` when user has connected wallet, falls back to server actions otherwise
 - Handles any smart contract transaction with raw data
 - Shows transaction details, contract interaction info, and intent
 - Supports the new Thirdweb AI transaction format
@@ -103,3 +104,44 @@ To test the integration:
 - Multi-chain transaction support
 - Batch transaction execution
 - Transaction history and analytics
+
+## Smart Wallet Integration (Latest Update)
+
+The system now intelligently detects whether a user has connected their own wallet using Thirdweb React SDK:
+
+### **Wallet Detection Logic:**
+- **Connected Wallet**: Uses Thirdweb React SDK's `TransactionButton` component for direct wallet signing
+- **No Wallet**: Falls back to server-side execution using Thirdweb HTTP API  
+- **Seamless UX**: Users see the same UI regardless of their wallet connection status
+
+### **Benefits of TransactionButton:**
+- ✅ **Direct wallet signing**: No need for wallet authentication with Thirdweb API
+- ✅ **Better UX**: Native wallet prompts and transaction confirmations  
+- ✅ **Gas estimation**: Automatic gas estimation and fee display
+- ✅ **Error handling**: Built-in error handling for failed transactions
+- ✅ **Transaction tracking**: Automatic transaction status updates
+
+### **Implementation Details:**
+```typescript
+// Detects connected wallet
+const activeAccount = useActiveAccount();
+
+// Uses TransactionButton when wallet is connected
+{activeAccount ? (
+  <TransactionButton
+    transaction={prepareThirdwebTransaction}
+    onTransactionConfirmed={(receipt) => {
+      // Handle success
+    }}
+  >
+    Sign & Execute Transaction
+  </TransactionButton>
+) : (
+  // Fallback to server action
+  <Button onClick={handleExecuteTransaction}>
+    Sign & Execute Transaction
+  </Button>
+)}
+```
+
+This approach provides the best user experience while maintaining compatibility with both connected and non-connected wallet scenarios.
