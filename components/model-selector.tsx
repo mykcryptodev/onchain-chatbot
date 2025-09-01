@@ -22,14 +22,15 @@ export function ModelSelector({
   selectedModelId,
   className,
 }: {
-  session: Session;
+  session: Session | null;
   selectedModelId: string;
 } & React.ComponentProps<typeof Button>) {
   const [open, setOpen] = useState(false);
   const [optimisticModelId, setOptimisticModelId] =
     useOptimistic(selectedModelId);
 
-  const userType = session.user.type;
+  // Default to ethereum user type for unauthenticated users
+  const userType = session?.user?.type || 'ethereum';
   const { availableChatModelIds } = entitlementsByUserType[userType];
 
   const availableChatModels = chatModels.filter((chatModel) =>

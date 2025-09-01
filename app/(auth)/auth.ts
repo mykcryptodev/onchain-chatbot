@@ -1,13 +1,10 @@
-import { compare } from 'bcrypt-ts';
 import NextAuth, { type DefaultSession } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
-import { createGuestUser, getUser } from '@/lib/db/queries';
 import { authConfig } from './auth.config';
-import { DUMMY_PASSWORD } from '@/lib/constants';
 import type { DefaultJWT } from 'next-auth/jwt';
 import { handleEthereumLogin } from '@/lib/auth-ethereum';
 
-export type UserType = 'guest' | 'regular' | 'ethereum';
+export type UserType = 'ethereum';
 
 declare module 'next-auth' {
   interface Session extends DefaultSession {
@@ -40,38 +37,6 @@ export const {
   ...authConfig,
   providers: [
     Credentials({
-      credentials: {},
-      async authorize({ email, password }: any) {
-        const users = await getUser(email);
-
-        if (users.length === 0) {
-          await compare(password, DUMMY_PASSWORD);
-          return null;
-        }
-
-        const [user] = users;
-
-        if (!user.password) {
-          await compare(password, DUMMY_PASSWORD);
-          return null;
-        }
-
-        const passwordsMatch = await compare(password, user.password);
-
-        if (!passwordsMatch) return null;
-
-        return { ...user, type: 'regular' };
-      },
-    }),
-    Credentials({
-      id: 'guest',
-      credentials: {},
-      async authorize() {
-        const [guestUser] = await createGuestUser();
-        return { ...guestUser, type: 'guest' };
-      },
-    }),
-    Credentials({
       id: 'ethereum',
       credentials: {
         address: { type: 'text' },
@@ -79,6 +44,12 @@ export const {
         message: { type: 'text' },
       },
       async authorize({ address, signature, message }: any) {
+        console.log('Ethereum authorize called with:', {
+          address,
+          signature: `${signature?.substring(0, 10)}...`,
+          message: typeof message,
+        });
+
         if (!address || !signature || !message) {
           console.log('Missing required fields for Ethereum auth');
           return null;
@@ -90,10 +61,17 @@ export const {
           message,
         });
 
+        console.log('handleEthereumLogin result:', result);
+
         if (!result.success || !result.user) {
+          console.log('Ethereum login failed or no user returned');
           return null;
         }
 
+        console.log('Ethereum auth successful, returning user:', {
+          ...result.user,
+          type: 'ethereum',
+        });
         return { ...result.user, type: 'ethereum' };
       },
     }),
