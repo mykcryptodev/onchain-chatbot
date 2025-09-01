@@ -7,6 +7,7 @@ import './globals.css';
 import { SessionProvider } from 'next-auth/react';
 import { default as ThirdwebProviderComponent } from '@/providers/Thirdweb';
 import { FarcasterProvider } from '@/components/farcaster-provider';
+import { ToastProvider } from '@/components/toast';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://chat.vercel.ai'),
@@ -124,7 +125,9 @@ export default async function RootLayout({
           <Toaster position="top-center" />
           <SessionProvider>
             <ThirdwebProviderComponent>
-              <FarcasterProvider>{children}</FarcasterProvider>
+              <FarcasterProvider>
+                <ToastProvider>{children}</ToastProvider>
+              </FarcasterProvider>
             </ThirdwebProviderComponent>
           </SessionProvider>
         </ThemeProvider>

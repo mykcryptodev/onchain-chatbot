@@ -4,48 +4,41 @@ import React, { useEffect, useRef, useState, type ReactNode } from 'react';
 import { toast as sonnerToast } from 'sonner';
 import { CheckCircleFillIcon, WarningIcon } from './icons';
 import { cn } from '@/lib/utils';
-
-// Helper function to trigger haptic feedback
-// This will work in Farcaster frames and fallback to browser vibration
-function triggerHaptic(type: 'light' | 'medium' | 'heavy' = 'light') {
-  try {
-    // Check if we're in a Farcaster frame
-    if (typeof window !== 'undefined' && (window as any).parent !== window) {
-      // Try to access Farcaster SDK from parent frame
-      const farcasterSdk = (window as any).parent?.farcaster;
-      if (farcasterSdk?.haptics) {
-        farcasterSdk.haptics.impactOccurred(type).catch(() => {
-          // Fallback to browser vibration if Farcaster haptics fail
-          fallbackVibration(type);
-        });
-        return;
-      }
-    }
-
-    // Fallback to browser vibration API
-    fallbackVibration(type);
-  } catch (error) {
-    // Silent fallback - haptics are not critical functionality
-    console.debug('Haptic feedback not available:', error);
-  }
-}
-
-function fallbackVibration(type: 'light' | 'medium' | 'heavy') {
-  const vibrationPattern = type === 'heavy' ? 100 : type === 'medium' ? 75 : 50;
-  if (
-    typeof window !== 'undefined' &&
-    'navigator' in window &&
-    'vibrate' in navigator
-  ) {
-    navigator.vibrate(vibrationPattern);
-  }
-}
+import { useFarcaster } from '@/components/farcaster-provider';
 
 const iconsByType: Record<'success' | 'error' | 'info', ReactNode> = {
   success: <CheckCircleFillIcon />,
   error: <WarningIcon />,
   info: <WarningIcon />,
 };
+
+// Global haptic trigger function - will be set by ToastProvider
+let globalTriggerHaptic:
+  | ((type?: 'light' | 'medium' | 'heavy') => void)
+  | null = null;
+
+export function setGlobalHapticTrigger(
+  triggerFn: (type?: 'light' | 'medium' | 'heavy') => void,
+) {
+  globalTriggerHaptic = triggerFn;
+}
+
+function triggerHapticSafely(type: 'light' | 'medium' | 'heavy' = 'light') {
+  if (globalTriggerHaptic) {
+    globalTriggerHaptic(type);
+  } else {
+    // Fallback to browser vibration API if haptic provider not available
+    const vibrationPattern =
+      type === 'heavy' ? 100 : type === 'medium' ? 75 : 50;
+    if (
+      typeof window !== 'undefined' &&
+      'navigator' in window &&
+      'vibrate' in navigator
+    ) {
+      navigator.vibrate(vibrationPattern);
+    }
+  }
+}
 
 export function toast(props: Omit<ToastProps, 'id'>) {
   return sonnerToast.custom((id) => (
@@ -55,15 +48,15 @@ export function toast(props: Omit<ToastProps, 'id'>) {
 
 // Add convenience methods with haptic feedback
 toast.success = (description: string) => {
-  triggerHaptic('medium'); // Success gets medium haptic feedback
+  triggerHapticSafely('medium'); // Success gets medium haptic feedback
   return toast({ type: 'success', description });
 };
 toast.error = (description: string) => {
-  triggerHaptic('heavy'); // Error gets heavy haptic feedback
+  triggerHapticSafely('heavy'); // Error gets heavy haptic feedback
   return toast({ type: 'error', description });
 };
 toast.info = (description: string) => {
-  triggerHaptic('light'); // Info gets light haptic feedback
+  triggerHapticSafely('light'); // Info gets light haptic feedback
   return toast({ type: 'info', description });
 };
 
@@ -77,7 +70,7 @@ toast.promise = <T,>(
   },
 ) => {
   // Show loading toast with light haptic
-  triggerHaptic('light');
+  triggerHapticSafely('light');
   const loadingToast = sonnerToast.custom((id) => (
     <Toast id={id} type="info" description={options.loading} />
   ));
@@ -88,7 +81,7 @@ toast.promise = <T,>(
         typeof options.success === 'function'
           ? options.success(data)
           : options.success;
-      triggerHaptic('medium'); // Success haptic
+      triggerHapticSafely('medium'); // Success haptic
       sonnerToast.custom((id) => (
         <Toast id={id} type="success" description={successMessage} />
       ));
@@ -99,13 +92,27 @@ toast.promise = <T,>(
         typeof options.error === 'function'
           ? options.error(error)
           : options.error;
-      triggerHaptic('heavy'); // Error haptic
+      triggerHapticSafely('heavy'); // Error haptic
       sonnerToast.custom((id) => (
         <Toast id={id} type="error" description={errorMessage} />
       ));
       throw error;
     });
 };
+
+// Toast Provider component to set up haptic integration
+export function ToastProvider({ children }: { children: React.ReactNode }) {
+  const { triggerHaptic } = useFarcaster();
+
+  useEffect(() => {
+    setGlobalHapticTrigger(triggerHaptic);
+    return () => {
+      globalTriggerHaptic = null;
+    };
+  }, [triggerHaptic]);
+
+  return <>{children}</>;
+}
 
 function Toast(props: ToastProps) {
   const { id, type, description } = props;
