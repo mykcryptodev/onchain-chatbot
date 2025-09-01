@@ -13,6 +13,7 @@ import { deleteTrailingMessages } from '@/app/(chat)/actions';
 import type { UseChatHelpers } from '@ai-sdk/react';
 import type { ChatMessage } from '@/lib/types';
 import { getTextFromMessage } from '@/lib/utils';
+import { useFarcaster } from '@/components/farcaster-provider';
 
 export type MessageEditorProps = {
   message: ChatMessage;
@@ -33,6 +34,7 @@ export function MessageEditor({
     getTextFromMessage(message),
   );
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const { triggerHaptic } = useFarcaster();
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -100,6 +102,8 @@ export function MessageEditor({
             });
 
             setMode('view');
+            // Trigger haptic feedback when regenerating
+            triggerHaptic('medium');
             regenerate();
           }}
         >

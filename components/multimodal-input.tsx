@@ -36,6 +36,7 @@ import type { VisibilityType } from './visibility-selector';
 import type { Attachment, ChatMessage } from '@/lib/types';
 import type { Session } from 'next-auth';
 import { SharedConnectButton } from '@/components/shared-connect-button';
+import { useFarcaster } from '@/components/farcaster-provider';
 
 function PureMultimodalInput({
   chatId,
@@ -72,6 +73,7 @@ function PureMultimodalInput({
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { width } = useWindowSize();
+  const { triggerHaptic } = useFarcaster();
 
   // Check if user is authenticated
   const isAuthenticated = !!session?.user;
@@ -127,6 +129,9 @@ function PureMultimodalInput({
   const submitForm = useCallback(() => {
     window.history.replaceState({}, '', `/chat/${chatId}`);
 
+    // Trigger haptic feedback when user sends message
+    triggerHaptic('medium');
+
     sendMessage({
       role: 'user',
       parts: [
@@ -160,6 +165,7 @@ function PureMultimodalInput({
     setLocalStorageInput,
     width,
     chatId,
+    triggerHaptic,
   ]);
 
   const uploadFile = async (file: File) => {

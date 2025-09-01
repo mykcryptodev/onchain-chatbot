@@ -52,6 +52,8 @@ export function Chat({
 
   const [input, setInput] = useState<string>('');
   const [messageChunkCount, setMessageChunkCount] = useState<number>(0);
+  const [hasTriggeredMessageHaptic, setHasTriggeredMessageHaptic] =
+    useState<boolean>(false);
 
   const {
     messages,
@@ -91,25 +93,34 @@ export function Chat({
       );
       setDataStream((ds) => (ds ? [...ds, dataPart] : []));
 
-      // Trigger haptic feedback on every data chunk - simplified approach
-      console.debug('Triggering haptic for data chunk, type:', dataPart.type);
+      // Trigger haptic feedback only once per message response
+      if (!hasTriggeredMessageHaptic) {
+        console.debug(
+          'Triggering haptic for new message response, type:',
+          dataPart.type,
+        );
+        triggerHaptic('light');
+        setHasTriggeredMessageHaptic(true);
+      }
+
       setMessageChunkCount((prev) => prev + 1);
-      triggerHaptic('light');
     },
     onFinish: () => {
       mutate(unstable_serialize(getChatHistoryPaginationKey));
       // Trigger strong haptic when bot response is complete
       console.debug('Bot response finished, triggering heavy haptic');
       triggerHaptic('heavy');
-      // Reset the chunk counter for the next response
+      // Reset counters for the next response
       setMessageChunkCount(0);
+      setHasTriggeredMessageHaptic(false);
     },
     onError: (error) => {
       if (error instanceof ChatSDKError) {
         toast.error(error.message);
       }
-      // Reset the chunk counter when there's an error
+      // Reset counters when there's an error
       setMessageChunkCount(0);
+      setHasTriggeredMessageHaptic(false);
     },
   });
 
@@ -144,11 +155,12 @@ export function Chat({
     selectedChainsRef.current = selectedChains;
   }, [selectedChains]);
 
-  // Reset chunk counter when new message is submitted
+  // Reset counters when new message is submitted
   useEffect(() => {
     console.debug('Chat status changed:', status);
     if (status === 'submitted') {
       setMessageChunkCount(0);
+      setHasTriggeredMessageHaptic(false);
     }
   }, [status]);
 
