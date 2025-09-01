@@ -17,6 +17,8 @@ import {
 import { MessageActions } from './message-actions';
 import { PreviewAttachment } from './preview-attachment';
 import { Weather } from './weather';
+import { SwapTransaction } from './swap-transaction';
+import { RawTransaction } from './raw-transaction';
 import equal from 'fast-deep-equal';
 import { cn, sanitizeText } from '@/lib/utils';
 import { Button } from './ui/button';
@@ -329,6 +331,92 @@ const PurePreviewMessage = ({
               }
 
               if (typeof type === 'string' && type.includes('tool-sign_swap')) {
+                // Type guard to ensure we have a tool part
+                if ('toolCallId' in part && 'state' in part) {
+                  const { toolCallId, state } = part;
+
+                  return (
+                    <Tool
+                      key={toolCallId || `${message.id}-${index}`}
+                      defaultOpen={true}
+                    >
+                      <ToolHeader
+                        type="tool-sign_swap"
+                        state={state || 'output-available'}
+                      />
+                      <ToolContent>
+                        {(state === 'input-available' ||
+                          state === 'input-streaming') &&
+                          'input' in part && (
+                            <>
+                              <ToolInput input={part.input} />
+                              {/* Show transaction UI from input if it contains transaction data */}
+                              {part.input &&
+                                typeof part.input === 'object' &&
+                                'transaction' in part.input &&
+                                'action' in part.input && (
+                                  <ToolOutput
+                                    output={
+                                      <RawTransaction
+                                        transactionData={part.input as any}
+                                      />
+                                    }
+                                    errorText={undefined}
+                                  />
+                                )}
+                            </>
+                          )}
+                        {(state === 'output-available' ||
+                          state === 'input-streaming') &&
+                          'output' in part && (
+                            <ToolOutput
+                              output={
+                                part.output &&
+                                typeof part.output === 'object' ? (
+                                  // Check if it's the new raw transaction format
+                                  'transaction' in part.output &&
+                                  'action' in part.output ? (
+                                    <RawTransaction
+                                      transactionData={part.output as any}
+                                    />
+                                  ) : // Check if it's the old swap format
+                                  'tokenIn' in part.output &&
+                                    'tokenOut' in part.output ? (
+                                    <SwapTransaction
+                                      swapData={part.output as any}
+                                    />
+                                  ) : (
+                                    <div className="space-y-2">
+                                      <p>Processing transaction data...</p>
+                                      <div className="p-3 bg-muted rounded-lg">
+                                        <pre className="text-xs text-muted-foreground overflow-x-auto">
+                                          {JSON.stringify(part.output, null, 2)}
+                                        </pre>
+                                      </div>
+                                    </div>
+                                  )
+                                ) : (
+                                  <div className="space-y-2">
+                                    <p>Preparing transaction...</p>
+                                    <div className="p-3 bg-muted rounded-lg">
+                                      <p className="text-sm text-muted-foreground">
+                                        {typeof part.output === 'string'
+                                          ? part.output
+                                          : 'Transaction data is being processed.'}
+                                      </p>
+                                    </div>
+                                  </div>
+                                )
+                              }
+                              errorText={undefined}
+                            />
+                          )}
+                      </ToolContent>
+                    </Tool>
+                  );
+                }
+
+                // Fallback for non-tool parts
                 return (
                   <Tool key={`${message.id}-${index}`} defaultOpen={true}>
                     <ToolHeader
@@ -339,16 +427,7 @@ const PurePreviewMessage = ({
                       <ToolOutput
                         output={
                           <div className="space-y-2">
-                            <p>
-                              Thirdweb AI swap tool detected. This feature is
-                              being integrated.
-                            </p>
-                            <div className="p-3 bg-muted rounded-lg">
-                              <p>
-                                Swap tools will be available once the
-                                integration is complete.
-                              </p>
-                            </div>
+                            <p>Swap tool detected but data is not available.</p>
                           </div>
                         }
                         errorText={undefined}

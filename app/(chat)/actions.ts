@@ -47,7 +47,7 @@ export async function generateTitleFromUserMessage({
       // Create a simple title by taking first 60 characters and adding ellipsis if needed
       const fallbackTitle =
         userText.length > 60
-          ? userText.substring(0, 60).trim() + '...'
+          ? `${userText.substring(0, 60).trim()}...`
           : userText;
 
       return fallbackTitle;

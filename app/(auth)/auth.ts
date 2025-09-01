@@ -11,6 +11,7 @@ declare module 'next-auth' {
     user: {
       id: string;
       type: UserType;
+      walletAddress?: string;
     } & DefaultSession['user'];
   }
 
@@ -18,6 +19,7 @@ declare module 'next-auth' {
     id?: string;
     email?: string | null;
     type: UserType;
+    walletAddress?: string;
   }
 }
 
@@ -25,6 +27,7 @@ declare module 'next-auth/jwt' {
   interface JWT extends DefaultJWT {
     id: string;
     type: UserType;
+    walletAddress?: string;
   }
 }
 
@@ -72,7 +75,11 @@ export const {
           ...result.user,
           type: 'ethereum',
         });
-        return { ...result.user, type: 'ethereum' };
+        return {
+          ...result.user,
+          type: 'ethereum',
+          walletAddress: result.user.walletAddress || undefined,
+        };
       },
     }),
   ],
@@ -81,6 +88,7 @@ export const {
       if (user) {
         token.id = user.id as string;
         token.type = user.type;
+        token.walletAddress = user.walletAddress;
       }
 
       return token;
@@ -89,6 +97,7 @@ export const {
       if (session.user) {
         session.user.id = token.id;
         session.user.type = token.type;
+        session.user.walletAddress = token.walletAddress;
       }
 
       return session;

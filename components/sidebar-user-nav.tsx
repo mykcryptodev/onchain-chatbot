@@ -5,6 +5,7 @@ import { ConnectButton } from 'thirdweb/react';
 import { client } from '@/providers/Thirdweb';
 import { signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 import { SidebarMenu, SidebarMenuItem } from '@/components/ui/sidebar';
 import { Switch } from '@/components/ui/switch';
@@ -18,6 +19,11 @@ export function SidebarUserNav() {
   const { setTheme, resolvedTheme } = useTheme();
   const { update: updateSession } = useSession();
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <SidebarMenu>
@@ -26,11 +32,11 @@ export function SidebarUserNav() {
           {/* Theme Toggle */}
           <div className="flex items-center justify-between p-2 rounded-md hover:bg-sidebar-accent text-sm">
             <div className="flex items-center gap-2">
-              {resolvedTheme === 'light' ? '☀️' : '🌙'}
+              {mounted ? (resolvedTheme === 'light' ? '☀️' : '🌙') : '🌙'}
               <span>Dark Mode</span>
             </div>
             <Switch
-              checked={resolvedTheme === 'dark'}
+              checked={mounted ? resolvedTheme === 'dark' : false}
               onCheckedChange={(checked) =>
                 setTheme(checked ? 'dark' : 'light')
               }
@@ -40,7 +46,7 @@ export function SidebarUserNav() {
           {/* Connect Button */}
           <ConnectButton
             client={client}
-            theme={resolvedTheme === 'light' ? 'light' : 'dark'}
+            theme={mounted && resolvedTheme === 'light' ? 'light' : 'dark'}
             auth={{
               isLoggedIn: async (address) => {
                 try {
