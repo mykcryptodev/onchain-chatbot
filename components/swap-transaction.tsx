@@ -16,7 +16,7 @@ import {
   executeSwapTransaction,
   authenticateWithThirdweb,
 } from '@/lib/thirdweb-actions';
-import { toast } from 'sonner';
+import { toast } from '@/components/toast';
 import { AlertTriangle, ExternalLink } from 'lucide-react';
 import { getBlockExplorerUrl, getChainName } from '@/lib/utils';
 

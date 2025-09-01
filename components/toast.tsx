@@ -6,9 +6,10 @@ import { CheckCircleFillIcon, WarningIcon } from './icons';
 import { cn } from '@/lib/utils';
 import { useFarcaster } from '@/components/farcaster-provider';
 
-const iconsByType: Record<'success' | 'error', ReactNode> = {
+const iconsByType: Record<'success' | 'error' | 'info', ReactNode> = {
   success: <CheckCircleFillIcon />,
   error: <WarningIcon />,
+  info: <WarningIcon />,
 };
 
 export function toast(props: Omit<ToastProps, 'id'>) {
@@ -17,6 +18,12 @@ export function toast(props: Omit<ToastProps, 'id'>) {
   ));
 }
 
+// Add convenience methods
+toast.success = (description: string) =>
+  toast({ type: 'success', description });
+toast.error = (description: string) => toast({ type: 'error', description });
+toast.info = (description: string) => toast({ type: 'info', description });
+
 function Toast(props: ToastProps) {
   const { id, type, description } = props;
   const { triggerHaptic } = useFarcaster();
@@ -24,12 +31,18 @@ function Toast(props: ToastProps) {
   const descriptionRef = useRef<HTMLDivElement>(null);
   const [multiLine, setMultiLine] = useState(false);
 
-  // Trigger haptic feedback when toast appears - different intensity for success vs error
+  // Trigger haptic feedback when toast appears - different intensity for different types
   useEffect(() => {
+    console.log('🍞 Toast component mounted with type:', type);
     if (type === 'success') {
+      console.log('✅ Triggering medium haptic for success toast');
       triggerHaptic('medium'); // Success gets medium haptic feedback
     } else if (type === 'error') {
+      console.log('❌ Triggering heavy haptic for error toast');
       triggerHaptic('heavy'); // Error gets heavy haptic feedback
+    } else if (type === 'info') {
+      console.log('ℹ️ Triggering light haptic for info toast');
+      triggerHaptic('light'); // Info gets light haptic feedback
     }
   }, [type, triggerHaptic]);
 
@@ -63,7 +76,7 @@ function Toast(props: ToastProps) {
         <div
           data-type={type}
           className={cn(
-            'data-[type=error]:text-red-600 data-[type=success]:text-green-600',
+            'data-[type=error]:text-red-600 data-[type=success]:text-green-600 data-[type=info]:text-blue-600',
             { 'pt-1': multiLine },
           )}
         >
@@ -79,6 +92,6 @@ function Toast(props: ToastProps) {
 
 interface ToastProps {
   id: string | number;
-  type: 'success' | 'error';
+  type: 'success' | 'error' | 'info';
   description: string;
 }

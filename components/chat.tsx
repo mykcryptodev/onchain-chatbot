@@ -14,7 +14,7 @@ import type { VisibilityType } from './visibility-selector';
 import { useArtifactSelector } from '@/hooks/use-artifact';
 import { unstable_serialize } from 'swr/infinite';
 import { getChatHistoryPaginationKey } from './sidebar-history';
-import { toast } from './toast';
+import { toast } from '@/components/toast';
 import type { Session } from 'next-auth';
 import { useSearchParams } from 'next/navigation';
 import { useChatVisibility } from '@/hooks/use-chat-visibility';
@@ -89,6 +89,7 @@ export function Chat({
       // Trigger haptic feedback when AI starts responding (only once per response)
       // We trigger on the first data chunk regardless of status since onData means streaming has started
       if (!hasTriggeredResponseHaptic) {
+        console.log('🤖 AI response started - triggering haptic feedback');
         triggerHaptic();
         setHasTriggeredResponseHaptic(true);
       }
@@ -100,10 +101,7 @@ export function Chat({
     },
     onError: (error) => {
       if (error instanceof ChatSDKError) {
-        toast({
-          type: 'error',
-          description: error.message,
-        });
+        toast.error(error.message);
       }
       // Reset the haptic trigger flag when there's an error
       setHasTriggeredResponseHaptic(false);

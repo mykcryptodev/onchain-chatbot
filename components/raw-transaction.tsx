@@ -13,7 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Loader } from '@/components/elements/loader';
 import { executeRawTransaction } from '@/lib/thirdweb-actions';
-import { toast } from 'sonner';
+import { toast } from '@/components/toast';
 import {
   AccountAvatar,
   AccountName,
