@@ -134,7 +134,7 @@ export function SwapTransaction({ swapData }: SwapTransactionProps) {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 transition-colors"
               >
-                <ExternalLink className="h-3 w-3" />
+                <ExternalLink className="size-3" />
                 View on {getChainName(swapData.tokenIn.chainId)} Explorer
               </a>
             </div>
@@ -230,7 +230,7 @@ export function SwapTransaction({ swapData }: SwapTransactionProps) {
 
         {/* Warning */}
         <Alert>
-          <AlertTriangle className="h-4 w-4" />
+          <AlertTriangle className="size-4" />
           <div>
             <AlertTitle>Important</AlertTitle>
             <AlertDescription>

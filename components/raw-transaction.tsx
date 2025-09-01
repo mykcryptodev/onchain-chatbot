@@ -20,6 +20,11 @@ import {
   TransactionButton,
   useActiveAccount,
   useReadContract,
+  TokenProvider,
+  TokenSymbol,
+  TokenName,
+  AccountProvider,
+  AccountAddress,
 } from 'thirdweb/react';
 import { prepareTransaction, getContract, toTokens } from 'thirdweb';
 import { client } from '@/providers/Thirdweb';
@@ -29,13 +34,6 @@ import { AlertTriangle, CheckCircle, ExternalLink } from 'lucide-react';
 import { getBlockExplorerUrl, getChainName } from '@/lib/utils';
 import { ContractAddressDisplay } from '@/components/contract-address-display';
 import { shortenAddress } from 'thirdweb/utils';
-import {
-  TokenProvider,
-  TokenSymbol,
-  TokenName,
-  AccountProvider,
-  AccountAddress,
-} from 'thirdweb/react';
 
 interface RawTransactionProps {
   transactionData: {
@@ -323,7 +321,7 @@ export function RawTransaction({ transactionData }: RawTransactionProps) {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 transition-colors"
               >
-                <ExternalLink className="h-3 w-3" />
+                <ExternalLink className="size-3" />
                 View on {getChainName(transactionData.transaction.chain_id)}{' '}
                 Explorer
               </a>
@@ -455,7 +453,7 @@ export function RawTransaction({ transactionData }: RawTransactionProps) {
                       client={client}
                     >
                       <div className="flex items-center gap-2">
-                        <AccountAvatar className="rounded-full w-5 h-5" />
+                        <AccountAvatar className="rounded-full size-5" />
                         <AccountName className="text-sm font-medium" />
                       </div>
                       <p className="text-xs text-muted-foreground">
@@ -509,7 +507,7 @@ export function RawTransaction({ transactionData }: RawTransactionProps) {
             {needsApproval && !isApproved && (
               <div className="space-y-2">
                 <Alert>
-                  <AlertTriangle className="h-4 w-4" />
+                  <AlertTriangle className="size-4" />
                   <div>
                     <AlertTitle>Approval Required</AlertTitle>
                     <AlertDescription>
@@ -597,7 +595,7 @@ export function RawTransaction({ transactionData }: RawTransactionProps) {
               >
                 {needsApproval && !isApproved ? (
                   <>
-                    <CheckCircle className="mr-2 h-4 w-4" />
+                    <CheckCircle className="mr-2 size-4" />
                     Waiting for Approval...
                   </>
                 ) : transactionData.transaction.function === 'transfer' ? (
@@ -630,7 +628,7 @@ export function RawTransaction({ transactionData }: RawTransactionProps) {
 
         {/* Warning */}
         <Alert>
-          <AlertTriangle className="h-4 w-4" />
+          <AlertTriangle className="size-4" />
           <div>
             <AlertTitle>Important</AlertTitle>
             <AlertDescription>

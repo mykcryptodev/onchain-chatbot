@@ -157,7 +157,7 @@ export function SendTokenTransaction({ sendData }: SendTokenTransactionProps) {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 transition-colors"
               >
-                <ExternalLink className="h-3 w-3" />
+                <ExternalLink className="size-3" />
                 View on {getChainName(sendData.chainId)} Explorer
               </a>
             </div>
@@ -171,7 +171,7 @@ export function SendTokenTransaction({ sendData }: SendTokenTransactionProps) {
     <Card className="w-full max-w-md">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Send className="h-4 w-4" />
+          <Send className="size-4" />
           Token Send Transaction
         </CardTitle>
         <CardDescription>
@@ -274,7 +274,7 @@ export function SendTokenTransaction({ sendData }: SendTokenTransactionProps) {
             </>
           ) : (
             <>
-              <Send className="mr-2 h-4 w-4" />
+              <Send className="mr-2 size-4" />
               Execute Token Send
             </>
           )}
@@ -282,7 +282,7 @@ export function SendTokenTransaction({ sendData }: SendTokenTransactionProps) {
 
         {/* Warning */}
         <Alert>
-          <AlertTriangle className="h-4 w-4" />
+          <AlertTriangle className="size-4" />
           <div>
             <AlertTitle>Important</AlertTitle>
             <AlertDescription>
