@@ -358,9 +358,9 @@ export function RawTransaction({ transactionData }: RawTransactionProps) {
               Transaction Details:
             </p>
             <div className="p-2 sm:p-3 bg-muted rounded-lg space-y-2">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-0">
+              <div className="flex items-center justify-between gap-2">
                 <span className="text-xs sm:text-sm">From:</span>
-                <div className="text-left sm:text-right">
+                <div className="text-right">
                   <p className="text-xs sm:text-sm font-medium break-all">
                     {formatAmount(transactionData.intent.amount, true)}{' '}
                     <TokenProvider
@@ -383,9 +383,9 @@ export function RawTransaction({ transactionData }: RawTransactionProps) {
                 <div className="text-muted-foreground text-sm">↓</div>
               </div>
 
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-0">
+              <div className="flex items-center justify-between gap-2">
                 <span className="text-xs sm:text-sm">To:</span>
-                <div className="text-left sm:text-right">
+                <div className="text-right">
                   <p className="text-xs sm:text-sm font-medium break-all">
                     <TokenProvider
                       address={transactionData.intent.destination_token_address}
@@ -415,9 +415,9 @@ export function RawTransaction({ transactionData }: RawTransactionProps) {
               </p>
               <div className="p-2 sm:p-3 bg-muted rounded-lg space-y-2 sm:space-y-3">
                 {/* Token Being Transferred */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-0">
+                <div className="flex items-center justify-between gap-2">
                   <span className="text-xs sm:text-sm">Token:</span>
-                  <div className="text-left sm:text-right">
+                  <div className="text-right">
                     <TokenProvider
                       address={transactionData.transaction.to}
                       chain={defineChain(transactionData.transaction.chain_id)}
@@ -434,9 +434,9 @@ export function RawTransaction({ transactionData }: RawTransactionProps) {
                 </div>
 
                 {/* Amount */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-0">
+                <div className="flex items-center justify-between gap-2">
                   <span className="text-xs sm:text-sm">Amount:</span>
-                  <div className="text-left sm:text-right">
+                  <div className="text-right">
                     <TokenProvider
                       address={transactionData.transaction.to}
                       chain={defineChain(transactionData.transaction.chain_id)}
@@ -451,9 +451,9 @@ export function RawTransaction({ transactionData }: RawTransactionProps) {
                 </div>
 
                 {/* Recipient */}
-                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-0">
+                <div className="flex items-start justify-between gap-2">
                   <span className="text-xs sm:text-sm">To:</span>
-                  <div className="text-left sm:text-right">
+                  <div className="text-right">
                     <AccountProvider
                       address={transferData.recipient}
                       client={client}
@@ -478,29 +478,29 @@ export function RawTransaction({ transactionData }: RawTransactionProps) {
             Contract Interaction:
           </p>
           <div className="p-2 sm:p-3 bg-muted rounded-lg space-y-1 sm:space-y-2">
-            <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
+            <div className="flex justify-between gap-2">
               <span className="text-xs text-muted-foreground">Contract:</span>
               <ContractAddressDisplay
                 address={transactionData.transaction.to}
-                className="text-left sm:text-right break-all"
+                className="text-right break-all"
               />
             </div>
-            <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
+            <div className="flex justify-between gap-2">
               <span className="text-xs text-muted-foreground">Function:</span>
-              <span className="text-xs break-all">
+              <span className="text-xs break-all text-right">
                 {transactionData.transaction.function}
               </span>
             </div>
-            <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
+            <div className="flex justify-between gap-2">
               <span className="text-xs text-muted-foreground">Chain:</span>
               <Badge variant="outline" className="text-xs w-fit">
                 {getChainName(transactionData.transaction.chain_id)}
               </Badge>
             </div>
             {transactionData.transaction.value !== '0x0' && (
-              <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0">
+              <div className="flex justify-between gap-2">
                 <span className="text-xs text-muted-foreground">Value:</span>
-                <span className="text-xs break-all">
+                <span className="text-xs break-all text-right">
                   {transactionData.transaction.value}
                 </span>
               </div>

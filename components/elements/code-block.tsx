@@ -46,12 +46,12 @@ export const CodeBlock = ({
         <SyntaxHighlighter
           className="overflow-x-auto dark:hidden"
           codeTagProps={{
-            className: 'font-mono text-sm',
+            className: 'font-mono text-xs',
           }}
           customStyle={{
             margin: 0,
             padding: '1rem',
-            fontSize: '0.875rem',
+            fontSize: '0.275rem',
             background: 'hsl(var(--background))',
             color: 'hsl(var(--foreground))',
           }}
@@ -69,12 +69,12 @@ export const CodeBlock = ({
         <SyntaxHighlighter
           className="hidden overflow-x-auto dark:block"
           codeTagProps={{
-            className: 'font-mono text-sm',
+            className: 'font-mono text-xs',
           }}
           customStyle={{
             margin: 0,
             padding: '1rem',
-            fontSize: '0.875rem',
+            fontSize: '0.275rem',
             background: 'hsl(var(--background))',
             color: 'hsl(var(--foreground))',
           }}
