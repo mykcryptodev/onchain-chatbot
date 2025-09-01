@@ -96,8 +96,58 @@ export async function handleEthereumLogin({
   message: string;
 }) {
   try {
-    // In a production app, you would verify the signature here
-    // For now, we trust that thirdweb ConnectButton has already verified it
+    // Parse the SIWE message to validate it
+    let parsedMessage: any;
+    try {
+      parsedMessage = JSON.parse(message);
+    } catch {
+      console.error('Invalid message format - not JSON');
+      return {
+        success: false,
+        error: 'Invalid message format',
+      };
+    }
+
+    // Basic validation of the SIWE payload
+    const now = new Date();
+    const expirationTime = new Date(parsedMessage.expiration_time);
+    const invalidBefore = new Date(parsedMessage.invalid_before);
+
+    // Check if message is expired
+    if (now > expirationTime) {
+      console.error('Message has expired');
+      return {
+        success: false,
+        error: 'Message has expired',
+      };
+    }
+
+    // Check if message is not yet valid
+    if (now < invalidBefore) {
+      console.error('Message is not yet valid');
+      return {
+        success: false,
+        error: 'Message is not yet valid',
+      };
+    }
+
+    // Verify the address matches
+    if (parsedMessage.address.toLowerCase() !== address.toLowerCase()) {
+      console.error('Address mismatch in message');
+      return {
+        success: false,
+        error: 'Address mismatch',
+      };
+    }
+
+    // Validate the domain matches your application
+    const expectedDomain = process.env.NEXT_PUBLIC_DOMAIN || 'localhost:3000';
+    if (parsedMessage.domain !== expectedDomain) {
+      return {
+        success: false,
+        error: 'Domain mismatch',
+      };
+    }
 
     // Check if user exists with this wallet address
     const existingUsers = await getUserByWallet(address);

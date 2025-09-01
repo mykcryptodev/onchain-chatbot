@@ -8,7 +8,7 @@ import {
   generatePayload as createPayload,
 } from '@/lib/auth-ethereum';
 
-import { signIn, auth } from './auth';
+import { signIn } from './auth';
 
 const authFormSchema = z.object({
   email: z.string().email(),
