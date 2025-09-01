@@ -262,7 +262,7 @@ function PureMultimodalInput({
       />
 
       <PromptInput
-        className="border border-transparent shadow-lg transition-all duration-200 shadow-black/10 hover:border-primary/20 focus-within:border-primary/30 focus-within:shadow-xl focus-within:shadow-primary/20"
+        className="py-2 border border-transparent shadow-lg transition-all duration-200 shadow-black/10 hover:border-primary/20 focus-within:border-primary/30 focus-within:shadow-xl focus-within:shadow-primary/20"
         onSubmit={(event) => {
           event.preventDefault();
           if (status !== 'ready') {
@@ -353,7 +353,8 @@ export const MultimodalInput = memo(
     if (!equal(prevProps.attachments, nextProps.attachments)) return false;
     if (prevProps.selectedVisibilityType !== nextProps.selectedVisibilityType)
       return false;
-    if (!equal(prevProps.selectedChains, nextProps.selectedChains)) return false;
+    if (!equal(prevProps.selectedChains, nextProps.selectedChains))
+      return false;
 
     return true;
   },
