@@ -158,7 +158,16 @@ export function FarcasterProvider({ children }: { children: React.ReactNode }) {
 export function useFarcaster() {
   const context = useContext(FarcasterContext);
   if (context === undefined) {
-    throw new Error('useFarcaster must be used within a FarcasterProvider');
+    // Instead of throwing an error that can cause 500 errors during SSR,
+    // provide a default context with safe fallbacks
+    return {
+      triggerHaptic: () => {}, // No-op function
+      context: null,
+      isSDKLoaded: false,
+      connectWallet: async () => {}, // No-op function
+      isConnecting: false,
+      isInFarcaster: false,
+    };
   }
   return context;
 }
