@@ -22,6 +22,7 @@ import { useAutoResume } from '@/hooks/use-auto-resume';
 import { ChatSDKError } from '@/lib/errors';
 import type { Attachment, ChatMessage } from '@/lib/types';
 import { useDataStream } from './data-stream-provider';
+import { useFarcaster } from '@/components/farcaster-provider';
 
 export function Chat({
   id,
@@ -47,8 +48,11 @@ export function Chat({
 
   const { mutate } = useSWRConfig();
   const { setDataStream } = useDataStream();
+  const { triggerHaptic } = useFarcaster();
 
   const [input, setInput] = useState<string>('');
+  const [hasTriggeredResponseHaptic, setHasTriggeredResponseHaptic] =
+    useState<boolean>(false);
 
   const {
     messages,
@@ -81,9 +85,17 @@ export function Chat({
     }),
     onData: (dataPart) => {
       setDataStream((ds) => (ds ? [...ds, dataPart] : []));
+
+      // Trigger haptic feedback when AI starts responding (only once per response)
+      if (!hasTriggeredResponseHaptic && status === 'streaming') {
+        triggerHaptic();
+        setHasTriggeredResponseHaptic(true);
+      }
     },
     onFinish: () => {
       mutate(unstable_serialize(getChatHistoryPaginationKey));
+      // Reset the haptic trigger flag when the response finishes
+      setHasTriggeredResponseHaptic(false);
     },
     onError: (error) => {
       if (error instanceof ChatSDKError) {
@@ -92,6 +104,8 @@ export function Chat({
           description: error.message,
         });
       }
+      // Reset the haptic trigger flag when there's an error
+      setHasTriggeredResponseHaptic(false);
     },
   });
 
@@ -125,6 +139,13 @@ export function Chat({
   useEffect(() => {
     selectedChainsRef.current = selectedChains;
   }, [selectedChains]);
+
+  // Reset haptic flag when status changes to submitted (new message sent)
+  useEffect(() => {
+    if (status === 'submitted') {
+      setHasTriggeredResponseHaptic(false);
+    }
+  }, [status]);
 
   const isArtifactVisible = useArtifactSelector((state) => state.isVisible);
 

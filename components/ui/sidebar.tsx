@@ -7,6 +7,7 @@ import { PanelLeft } from 'lucide-react';
 
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
+import { useFarcaster } from '@/components/farcaster-provider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
@@ -272,6 +273,7 @@ const SidebarTrigger = React.forwardRef<
   React.ComponentProps<typeof Button>
 >(({ className, onClick, ...props }, ref) => {
   const { toggleSidebar } = useSidebar();
+  const { triggerHaptic } = useFarcaster();
 
   return (
     <Button
@@ -282,6 +284,7 @@ const SidebarTrigger = React.forwardRef<
       className={cn('h-7 w-7', className)}
       onClick={(event) => {
         onClick?.(event);
+        triggerHaptic();
         toggleSidebar();
       }}
       {...props}
