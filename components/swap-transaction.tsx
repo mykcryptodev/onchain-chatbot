@@ -100,20 +100,20 @@ export function SwapTransaction({ swapData }: SwapTransactionProps) {
 
   if (isCompleted && transactionResult) {
     return (
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
             <span className="text-green-600">✓</span>
             Swap Completed
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-xs sm:text-sm">
             Your swap transaction has been successfully executed.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-3 sm:space-y-4">
           {transactionResult.transactionId && (
             <div>
-              <p className="text-sm font-medium">Transaction ID:</p>
+              <p className="text-xs sm:text-sm font-medium">Transaction ID:</p>
               <p className="text-xs text-muted-foreground font-mono break-all">
                 {transactionResult.transactionId}
               </p>
@@ -121,7 +121,9 @@ export function SwapTransaction({ swapData }: SwapTransactionProps) {
           )}
           {transactionResult.transactionHash && (
             <div className="space-y-2">
-              <p className="text-sm font-medium">Transaction Hash:</p>
+              <p className="text-xs sm:text-sm font-medium">
+                Transaction Hash:
+              </p>
               <p className="text-xs text-muted-foreground font-mono break-all">
                 {transactionResult.transactionHash}
               </p>
@@ -132,9 +134,9 @@ export function SwapTransaction({ swapData }: SwapTransactionProps) {
                 )}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 transition-colors"
+                className="inline-flex items-center gap-1 text-xs sm:text-sm text-blue-600 hover:text-blue-800 transition-colors break-all"
               >
-                <ExternalLink className="size-3" />
+                <ExternalLink className="size-3 flex-shrink-0" />
                 View on {getChainName(swapData.tokenIn.chainId)} Explorer
               </a>
             </div>
@@ -145,30 +147,32 @@ export function SwapTransaction({ swapData }: SwapTransactionProps) {
   }
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl">
       <CardHeader>
-        <CardTitle>Token Swap Transaction</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-sm sm:text-base">
+          Token Swap Transaction
+        </CardTitle>
+        <CardDescription className="text-xs sm:text-sm">
           {swapData.description || 'Review and execute the token swap below.'}
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-3 sm:space-y-4">
         {/* Token In */}
         <div className="space-y-2">
-          <p className="text-sm font-medium">From:</p>
-          <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-            <div>
-              <p className="font-medium">
+          <p className="text-xs sm:text-sm font-medium">From:</p>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-2 sm:p-3 bg-muted rounded-lg">
+            <div className="min-w-0 flex-1">
+              <p className="font-medium text-sm break-all">
                 {formatAmount(swapData.tokenIn.amount)}{' '}
                 {swapData.tokenIn.symbol || 'Token'}
               </p>
               {swapData.tokenIn.name && (
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-muted-foreground break-all">
                   {swapData.tokenIn.name}
                 </p>
               )}
             </div>
-            <Badge variant="secondary">
+            <Badge variant="secondary" className="text-xs w-fit">
               {getChainName(swapData.tokenIn.chainId)}
             </Badge>
           </div>
@@ -176,30 +180,30 @@ export function SwapTransaction({ swapData }: SwapTransactionProps) {
 
         {/* Arrow */}
         <div className="flex justify-center">
-          <div className="text-muted-foreground">↓</div>
+          <div className="text-muted-foreground text-sm">↓</div>
         </div>
 
         {/* Token Out */}
         <div className="space-y-2">
-          <p className="text-sm font-medium">To:</p>
-          <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-            <div>
-              <p className="font-medium">
+          <p className="text-xs sm:text-sm font-medium">To:</p>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-2 sm:p-3 bg-muted rounded-lg">
+            <div className="min-w-0 flex-1">
+              <p className="font-medium text-sm break-all">
                 {swapData.tokenOut.symbol || 'Token'}
                 {swapData.tokenOut.minAmount && (
-                  <span className="text-sm text-muted-foreground">
+                  <span className="text-xs text-muted-foreground">
                     {' '}
                     (min: {formatAmount(swapData.tokenOut.minAmount)})
                   </span>
                 )}
               </p>
               {swapData.tokenOut.name && (
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-muted-foreground break-all">
                   {swapData.tokenOut.name}
                 </p>
               )}
             </div>
-            <Badge variant="secondary">
+            <Badge variant="secondary" className="text-xs w-fit">
               {getChainName(swapData.tokenOut.chainId)}
             </Badge>
           </div>
@@ -207,7 +211,7 @@ export function SwapTransaction({ swapData }: SwapTransactionProps) {
 
         {/* Gas Estimate */}
         {swapData.estimatedGas && (
-          <div className="text-xs text-muted-foreground">
+          <div className="text-xs text-muted-foreground break-all">
             Estimated Gas: {swapData.estimatedGas}
           </div>
         )}
