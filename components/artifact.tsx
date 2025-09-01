@@ -67,6 +67,8 @@ function PureArtifact({
   votes,
   isReadonly,
   selectedVisibilityType,
+  selectedChains,
+  setSelectedChains,
 }: {
   chatId: string;
   input: string;
@@ -82,6 +84,8 @@ function PureArtifact({
   regenerate: UseChatHelpers<ChatMessage>['regenerate'];
   isReadonly: boolean;
   selectedVisibilityType: VisibilityType;
+  selectedChains: number[];
+  setSelectedChains: Dispatch<SetStateAction<number[]>>;
 }) {
   const { artifact, setArtifact, metadata, setMetadata } = useArtifact();
 
@@ -336,6 +340,8 @@ function PureArtifact({
                     className="bg-background dark:bg-muted"
                     setMessages={setMessages}
                     selectedVisibilityType={selectedVisibilityType}
+                    selectedChains={selectedChains}
+                    setSelectedChains={setSelectedChains}
                   />
                 </div>
               </div>

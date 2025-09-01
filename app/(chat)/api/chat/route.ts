@@ -79,11 +79,13 @@ export async function POST(request: Request) {
       message,
       selectedChatModel,
       selectedVisibilityType,
+      selectedChains,
     }: {
       id: string;
       message: ChatMessage;
       selectedChatModel: ChatModel['id'];
       selectedVisibilityType: VisibilityType;
+      selectedChains?: number[];
     } = requestBody;
 
     const session = await auth();
@@ -158,10 +160,15 @@ export async function POST(request: Request) {
           const user = await getUserById(session.user.id);
           const userWalletAddress = user?.walletAddress || undefined;
 
+          console.log('selectedChains', selectedChains);
+
           const result = streamText({
             model: thirdwebAI.chat({
               context: {
-                chain_ids: [1, 8453, 137], // Ethereum, Base, Polygon
+                chain_ids:
+                  selectedChains && selectedChains.length > 0
+                    ? selectedChains
+                    : [8453], // Use selected chains or default to Base
                 from: userWalletAddress, // Use authenticated user's wallet
                 auto_execute_transactions: false, // Let user confirm transactions
               },

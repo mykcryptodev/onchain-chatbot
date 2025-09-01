@@ -18,13 +18,7 @@ export async function isLoggedIn(): Promise<boolean> {
 // Check if specific wallet address is logged in
 export async function isWalletLoggedIn(address: string): Promise<boolean> {
   try {
-    console.log('Checking wallet login status for:', address);
-
     const session = await auth();
-    console.log(
-      'Session:',
-      session?.user ? { id: session.user.id, type: session.user.type } : null,
-    );
 
     if (!session?.user) {
       console.log('No session found, returning false');
@@ -33,7 +27,6 @@ export async function isWalletLoggedIn(address: string): Promise<boolean> {
 
     // Check if the current session belongs to this wallet address
     const users = await getUserByWallet(address);
-    console.log('Users found for wallet:', users.length);
 
     if (users.length === 0) {
       console.log('No user found for wallet address, returning false');
@@ -42,14 +35,6 @@ export async function isWalletLoggedIn(address: string): Promise<boolean> {
 
     const walletUser = users[0];
     const isMatch = session.user.id === walletUser.id;
-    console.log(
-      'Session user ID:',
-      session.user.id,
-      'Wallet user ID:',
-      walletUser.id,
-      'Match:',
-      isMatch,
-    );
 
     return isMatch;
   } catch (error) {

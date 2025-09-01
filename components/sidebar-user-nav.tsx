@@ -14,6 +14,7 @@ import {
   generatePayload,
   loginWithEthereum,
 } from '@/app/(auth)/actions';
+import { base } from 'thirdweb/chains';
 
 export function SidebarUserNav() {
   const { setTheme, resolvedTheme } = useTheme();

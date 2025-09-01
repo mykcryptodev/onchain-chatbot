@@ -2,7 +2,7 @@
 
 import { DefaultChatTransport } from 'ai';
 import { useChat } from '@ai-sdk/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import { ChatHeader } from '@/components/chat-header';
 import type { Vote } from '@/lib/db/schema';
@@ -67,12 +67,17 @@ export function Chat({
       api: '/api/chat',
       fetch: fetchWithErrorHandlers,
       prepareSendMessagesRequest({ messages, id, body }) {
+        console.log(
+          'prepareSendMessagesRequest - selectedChains:',
+          selectedChainsRef.current,
+        );
         return {
           body: {
             id,
             message: messages.at(-1),
             selectedChatModel: initialChatModel,
             selectedVisibilityType: visibilityType,
+            selectedChains: selectedChainsRef.current,
             ...body,
           },
         };
@@ -117,6 +122,8 @@ export function Chat({
   );
 
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
+  const [selectedChains, setSelectedChains] = useState<number[]>([8453]); // Default to Base
+  const selectedChainsRef = useRef(selectedChains);
   const isArtifactVisible = useArtifactSelector((state) => state.isVisible);
 
   useAutoResume({
@@ -162,6 +169,8 @@ export function Chat({
               setMessages={setMessages}
               sendMessage={sendMessage}
               selectedVisibilityType={visibilityType}
+              selectedChains={selectedChains}
+              setSelectedChains={setSelectedChains}
             />
           )}
         </div>
@@ -182,6 +191,8 @@ export function Chat({
         votes={votes}
         isReadonly={isReadonly}
         selectedVisibilityType={visibilityType}
+        selectedChains={selectedChains}
+        setSelectedChains={setSelectedChains}
       />
     </>
   );

@@ -18,6 +18,7 @@ import { ArrowUpIcon, PaperclipIcon, StopIcon } from './icons';
 import { PreviewAttachment } from './preview-attachment';
 import { Button } from './ui/button';
 import { SuggestedActions } from './suggested-actions';
+import { BlockchainSelector } from './blockchain-selector';
 import {
   PromptInput,
   PromptInputTextarea,
@@ -46,6 +47,8 @@ function PureMultimodalInput({
   sendMessage,
   className,
   selectedVisibilityType,
+  selectedChains,
+  setSelectedChains,
 }: {
   chatId: string;
   input: string;
@@ -59,6 +62,8 @@ function PureMultimodalInput({
   sendMessage: UseChatHelpers<ChatMessage>['sendMessage'];
   className?: string;
   selectedVisibilityType: VisibilityType;
+  selectedChains: number[];
+  setSelectedChains: Dispatch<SetStateAction<number[]>>;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { width } = useWindowSize();
@@ -318,6 +323,11 @@ function PureMultimodalInput({
         <PromptInputToolbar className="px-2 py-1">
           <PromptInputTools className="gap-2">
             <AttachmentsButton fileInputRef={fileInputRef} status={status} />
+            <BlockchainSelector
+              selectedChains={selectedChains}
+              onSelectionChange={setSelectedChains}
+              disabled={status !== 'ready'}
+            />
           </PromptInputTools>
           {status === 'submitted' ? (
             <StopButton stop={stop} setMessages={setMessages} />
@@ -343,6 +353,7 @@ export const MultimodalInput = memo(
     if (!equal(prevProps.attachments, nextProps.attachments)) return false;
     if (prevProps.selectedVisibilityType !== nextProps.selectedVisibilityType)
       return false;
+    if (!equal(prevProps.selectedChains, nextProps.selectedChains)) return false;
 
     return true;
   },

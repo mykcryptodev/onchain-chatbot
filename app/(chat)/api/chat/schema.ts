@@ -27,6 +27,7 @@ export const postRequestBodySchema = z.object({
     'thirdweb-ai',
   ]),
   selectedVisibilityType: z.enum(['public', 'private']),
+  selectedChains: z.array(z.number()).optional(),
 });
 
 export type PostRequestBody = z.infer<typeof postRequestBodySchema>;

@@ -77,12 +77,10 @@ export async function getUserByWallet(
   walletAddress: string,
 ): Promise<Array<User>> {
   try {
-    console.log('getUserByWallet called with:', walletAddress);
     const result = await db
       .select()
       .from(user)
       .where(eq(user.walletAddress, walletAddress.toLowerCase()));
-    console.log('getUserByWallet result:', result);
     return result;
   } catch (error) {
     console.error('Database error in getUserByWallet:', error);

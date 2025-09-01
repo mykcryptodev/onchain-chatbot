@@ -10,14 +10,9 @@ import { signIn } from './auth';
 // Ethereum authentication functions for thirdweb ConnectButton
 export async function isLoggedIn(address: string): Promise<boolean> {
   try {
-    console.log('isLoggedIn called with address:', address);
-
     const result = await isWalletLoggedIn(address);
-    console.log('isWalletLoggedIn result:', result);
-
     // Ensure we always return a boolean
     const booleanResult = Boolean(result);
-    console.log('Final boolean result:', booleanResult);
     return booleanResult;
   } catch (error) {
     console.error('Error in isLoggedIn:', error);
