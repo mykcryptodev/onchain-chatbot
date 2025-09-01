@@ -9,6 +9,15 @@ const nextConfig: NextConfig = {
       {
         hostname: 'avatar.vercel.sh',
       },
+      {
+        hostname: 'ipfs.io',
+      },
+      {
+        hostname: 'gateway.ipfs.io',
+      },
+      {
+        hostname: 'cloudflare-ipfs.com',
+      },
     ],
   },
 };
