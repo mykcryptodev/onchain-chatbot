@@ -130,7 +130,7 @@ function PureMultimodalInput({
     window.history.replaceState({}, '', `/chat/${chatId}`);
 
     // Trigger haptic feedback when user sends message
-    triggerHaptic('medium');
+    triggerHaptic(); // Use default like sidebar
 
     sendMessage({
       role: 'user',

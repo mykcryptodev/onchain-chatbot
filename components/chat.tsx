@@ -83,17 +83,18 @@ export function Chat({
       },
     }),
     onData: (dataPart) => {
-      setDataStream((ds) => (ds ? [...ds, dataPart] : []));
-
       // Trigger haptic feedback on every data chunk for continuous feedback
-      triggerHaptic('light');
+      triggerHaptic(); // Use default like sidebar
+
+      setDataStream((ds) => (ds ? [...ds, dataPart] : []));
 
       setMessageChunkCount((prev) => prev + 1);
     },
     onFinish: () => {
-      mutate(unstable_serialize(getChatHistoryPaginationKey));
       // Trigger strong haptic when bot response is complete
-      triggerHaptic('heavy');
+      triggerHaptic(); // Use default like sidebar
+
+      mutate(unstable_serialize(getChatHistoryPaginationKey));
       // Reset counter for the next response
       setMessageChunkCount(0);
     },
