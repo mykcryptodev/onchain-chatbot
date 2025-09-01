@@ -46,7 +46,7 @@ export const metadata: Metadata = {
         action: {
           type: 'launch_frame',
           name: 'Onchain Chatbot',
-          url: 'https://chat.vercel.ai',
+          url: 'https://onchain-chatbot.vercel.app',
         },
       },
     }),
