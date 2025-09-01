@@ -89,7 +89,8 @@ const PurePreviewMessage = ({
 
           <div
             className={cn('flex flex-col gap-4 w-full min-w-0', {
-              'min-h-96': message.role === 'assistant' && requiresScrollPadding,
+              'min-h-32 sm:min-h-96':
+                message.role === 'assistant' && requiresScrollPadding,
             })}
           >
             {attachmentsFromMessage.length > 0 && (
