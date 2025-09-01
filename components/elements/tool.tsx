@@ -24,7 +24,7 @@ export type ToolProps = ComponentProps<typeof Collapsible>;
 export const Tool = ({ className, ...props }: ToolProps) => (
   <Collapsible
     className={cn(
-      'not-prose mb-4 w-full max-w-full rounded-md border overflow-hidden min-w-0',
+      'not-prose mb-4 w-full rounded-md border min-w-0 sm:max-w-2xl max-w-[350px] mx-auto sm:mx-0',
       className,
     )}
     {...props}
@@ -105,7 +105,7 @@ export type ToolInputProps = ComponentProps<'div'> & {
 
 export const ToolInput = ({ className, input, ...props }: ToolInputProps) => (
   <div
-    className={cn('space-y-2 p-2 sm:p-4 text-left max-w-3xl', className)}
+    className={cn('space-y-2 p-2 sm:p-4 text-left mx-auto', className)}
     {...props}
   >
     <h4 className="font-medium text-muted-foreground text-xs uppercase tracking-wide text-left">
@@ -134,7 +134,7 @@ export const ToolOutput = ({
 
   return (
     <div
-      className={cn('space-y-2 p-2 sm:p-4 text-left max-w-3xl', className)}
+      className={cn('space-y-2 p-2 sm:p-4 text-left mx-auto', className)}
       {...props}
     >
       <h4 className="font-medium text-muted-foreground text-xs uppercase tracking-wide text-left">
@@ -142,7 +142,7 @@ export const ToolOutput = ({
       </h4>
       <div
         className={cn(
-          'overflow-x-auto rounded-md text-xs [&_table]:w-full text-left',
+          'overflow-x-auto flex justify-center rounded-md text-xs [&_table]:w-full text-left',
           errorText
             ? 'bg-destructive/10 text-destructive'
             : 'bg-muted/50 text-foreground',
