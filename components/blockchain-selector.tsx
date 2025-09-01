@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
+import Image from 'next/image';
 import { Button } from './ui/button';
 import {
   DropdownMenu,
@@ -24,9 +25,9 @@ import {
   zkSync,
   linea,
   scroll,
+  getChainMetadata,
+  type Chain,
 } from 'thirdweb/chains';
-import type { Chain } from 'thirdweb/chains';
-import { getChainMetadata } from 'thirdweb/chains';
 
 // Define supported chains with their thirdweb chain objects
 const SUPPORTED_CHAINS: Array<{
@@ -138,7 +139,7 @@ function ChainIcon({ chain, size = 16 }: { chain: Chain; size?: number }) {
   }
 
   return (
-    <img
+    <Image
       src={iconUrl}
       alt={`${chainName} logo`}
       width={size}
@@ -171,14 +172,6 @@ export function BlockchainSelector({
       ? selectedChains.filter((id) => id !== chainId)
       : [...selectedChains, chainId];
 
-    console.log(
-      'Chain toggle:',
-      chainId,
-      'Current:',
-      selectedChains,
-      'New:',
-      newSelection,
-    );
     onSelectionChange(newSelection);
   };
 
@@ -199,7 +192,7 @@ export function BlockchainSelector({
             {selectedChains.length === 0 ? (
               <>
                 <span className="text-muted-foreground">Chains</span>
-                <ChevronDown className="h-3 w-3 text-muted-foreground" />
+                <ChevronDown className="size-3 text-muted-foreground" />
               </>
             ) : (
               <>
@@ -215,7 +208,7 @@ export function BlockchainSelector({
                     </Badge>
                   )}
                 </div>
-                <ChevronDown className="h-3 w-3 text-muted-foreground" />
+                <ChevronDown className="size-3 text-muted-foreground" />
               </>
             )}
           </div>

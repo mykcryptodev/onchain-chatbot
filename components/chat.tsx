@@ -67,10 +67,6 @@ export function Chat({
       api: '/api/chat',
       fetch: fetchWithErrorHandlers,
       prepareSendMessagesRequest({ messages, id, body }) {
-        console.log(
-          'prepareSendMessagesRequest - selectedChains:',
-          selectedChainsRef.current,
-        );
         return {
           body: {
             id,
@@ -124,6 +120,12 @@ export function Chat({
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
   const [selectedChains, setSelectedChains] = useState<number[]>([8453]); // Default to Base
   const selectedChainsRef = useRef(selectedChains);
+
+  // Keep ref in sync with state
+  useEffect(() => {
+    selectedChainsRef.current = selectedChains;
+  }, [selectedChains]);
+
   const isArtifactVisible = useArtifactSelector((state) => state.isVisible);
 
   useAutoResume({
