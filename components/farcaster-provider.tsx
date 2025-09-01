@@ -104,13 +104,21 @@ export function FarcasterProvider({ children }: { children: React.ReactNode }) {
   const triggerHaptic = useCallback(
     (type: 'light' | 'medium' | 'heavy' = 'light') => {
       // Use Farcaster SDK haptics with fallback to browser API
-      console.debug('Triggering haptic:', { type, isInFarcaster, hasSDK: !!sdk, hasHaptics: !!sdk?.haptics });
+      console.debug('Triggering haptic:', {
+        type,
+        isInFarcaster,
+        hasSDK: !!sdk,
+        hasHaptics: !!sdk?.haptics,
+      });
       try {
         if (isInFarcaster && sdk?.haptics) {
           // Use impact feedback for interactions with different intensities
           console.debug('Using Farcaster SDK haptics');
           sdk.haptics.impactOccurred(type).catch((error) => {
-            console.debug('Farcaster haptics failed, falling back to browser vibration:', error);
+            console.debug(
+              'Farcaster haptics failed, falling back to browser vibration:',
+              error,
+            );
             // Fallback to browser vibration API if SDK haptics fail
             const vibrationPattern =
               type === 'heavy' ? 100 : type === 'medium' ? 75 : 50;
