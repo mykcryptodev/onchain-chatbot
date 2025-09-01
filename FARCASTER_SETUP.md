@@ -140,11 +140,65 @@ The Open Graph image has been copied to `public/opengraph-image.png` to ensure i
 4. Test Farcaster embeds by sharing your pages in Farcaster clients
 5. Submit your MiniApp for review (if required)
 
+## Farcaster Wallet Auto-Connect
+
+The app now includes automatic wallet connection for users accessing it through Farcaster MiniApps:
+
+### Features
+
+- **Auto-Detection**: Automatically detects when running inside a Farcaster MiniApp
+- **Seamless Connection**: Auto-connects the user's Farcaster wallet to Base network
+- **Haptic Feedback**: Provides tactile feedback for better user experience
+- **Fallback Support**: Works gracefully in non-Farcaster environments
+
+### Usage in Components
+
+```tsx
+import { useFarcaster } from '@/components/farcaster-provider';
+
+function YourComponent() {
+  const { 
+    isInFarcaster, 
+    connectWallet, 
+    triggerHaptic, 
+    isConnecting,
+    context 
+  } = useFarcaster();
+
+  const handleAction = () => {
+    triggerHaptic(); // Provide haptic feedback
+    // Your action logic here
+  };
+
+  return (
+    <div>
+      {isInFarcaster && (
+        <p>Running in Farcaster MiniApp!</p>
+      )}
+      <button onClick={handleAction}>
+        Action with Haptics
+      </button>
+    </div>
+  );
+}
+```
+
+### Demo Component
+
+A `FarcasterWalletStatus` component is included to demonstrate the functionality:
+
+- Shows Farcaster badge when in a MiniApp
+- Displays wallet connection status
+- Provides manual connect button if auto-connect fails
+- Includes haptic feedback test button
+
 ## Testing Your Integration
 
 After deployment:
 
-1. Share your homepage URL in a Farcaster client
-2. Verify the embed shows your app name, image, and "Start Chat" button
-3. Test that clicking the button launches your MiniApp correctly
-4. Share individual chat URLs to test the "Continue Chat" functionality
+1. **Web Testing**: Share your homepage URL in a Farcaster client
+2. **Embed Verification**: Verify the embed shows your app name, image, and "Start Chat" button
+3. **MiniApp Launch**: Test that clicking the button launches your MiniApp correctly
+4. **Wallet Auto-Connect**: Verify that wallets connect automatically when opened through Farcaster
+5. **Haptic Feedback**: Test tactile feedback on supported devices
+6. **Deep Linking**: Share individual chat URLs to test the "Continue Chat" functionality
